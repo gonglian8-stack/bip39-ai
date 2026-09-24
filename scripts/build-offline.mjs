@@ -75,5 +75,6 @@ writeFileSync(`dist/downloads/${FILE}.sha256`, `${hash}  ${FILE}\n`);
 // download keeps its .html extension (and matches the name users verify).
 const base = FILE.replace(/\.html$/, '');
 writeFileSync('dist/_headers', readFileSync('dist/_headers', 'utf8') +
-  `\n/downloads/${base}\n  Content-Disposition: attachment; filename="${FILE}"\n`);
+  `\n/downloads/${base}\n  Content-Disposition: attachment; filename="${FILE}"\n` +
+  `\n/downloads/${FILE}.sha256\n  Content-Disposition: attachment; filename="${FILE}.sha256"\n`);
 console.log(`offline: ${FILE}  ${size}\nsha256: ${hash}`);
