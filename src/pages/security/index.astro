@@ -1,6 +1,6 @@
 ---
 import Trust from '../../layouts/Trust.astro';
-import { PAGES } from '../../site';
+import { PAGES, SITE } from '../../site';
 ---
 <Trust title="Security Model – BIP39.ai" description="What BIP39.ai protects against, what it cannot protect against, and how to verify its claims yourself."
   path={PAGES.security.href} h1="Security Model"
@@ -47,5 +47,5 @@ import { PAGES } from '../../site';
   <p>This project has <strong>not</strong> had an independent security audit. It does not offer reproducible builds or signed releases yet. These are listed as “Not yet available” on the <a href="/bip39-offline/#evidence">offline page</a> and will be updated with details if they happen.</p>
 
   <h2 id="report">Reporting a vulnerability</h2>
-  <p>TODO: security contact address and disclosure policy will be published with the source repository.</p>
+  <p>Please report vulnerabilities privately through <a href={`${SITE.repoUrl}/security/advisories/new`} rel="noopener">GitHub security advisories</a>, not in public issues. Include the version shown in the page footer and steps to reproduce. We aim to acknowledge reports within 7 days.</p>
 </Trust>

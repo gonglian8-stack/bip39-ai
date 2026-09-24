@@ -17,6 +17,5 @@
 
 ## 仍需人工确认
 
-- 维护者姓名与 GitHub 仓库地址（页脚、Open Source、Offline 页当前显示 TODO / Not yet published）。
-- 安全漏洞报告联系方式（Security 页 TODO）。
+- 需在 GitHub 仓库 Settings → Security 开启 Private vulnerability reporting（Security 页的报告入口依赖它）。
 - 屏幕阅读器实测（VoiceOver/NVDA）尚未进行。

@@ -16,10 +16,8 @@ export const SITE = {
   version: pkg.version,
   commit: gitCommit(),
   license: 'MIT',
-  /** TODO: set once the public GitHub repository exists. */
-  repoUrl: null as string | null,
-  /** TODO: maintainer name and profile URL. */
-  maintainer: null as { name: string; url: string } | null,
+  repoUrl: 'https://github.com/gonglian8-stack/bip39-ai' as string | null,
+  maintainer: { name: 'gonglian8-stack', url: 'https://github.com/gonglian8-stack' } as { name: string; url: string } | null,
   specUrl: 'https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki',
   wordlistUrl: 'https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt',
   vectorsUrl: 'https://github.com/trezor/python-mnemonic/blob/master/vectors.json',

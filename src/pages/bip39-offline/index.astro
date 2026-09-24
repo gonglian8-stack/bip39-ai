@@ -96,7 +96,7 @@ const faq: FaqItem[] = [
             <tr><td>SHA-256 published</td><td><span class="tag ok">Yes</span> on this page</td></tr>
             <tr><td>Official test vectors</td><td><span class="tag ok">Pass</span> 24/24 English vectors, checked on every build</td></tr>
             <tr><td>Independent implementation cross-check</td><td><span class="tag ok">Pass</span> 120 cases vs python-mnemonic 0.21</td></tr>
-            <tr><td>Source tag for this release</td><td>{SITE.repoUrl ? <a href={SITE.repoUrl} rel="noopener">View</a> : <span class="tag na">Not yet available</span>}</td></tr>
+            <tr><td>Source tag for this release</td><td>{SITE.repoUrl ? <a href={`${SITE.repoUrl}/tree/v${SITE.version}`} rel="noopener">v{SITE.version}</a> : <span class="tag na">Not yet available</span>}</td></tr>
             <tr><td>Reproducible build</td><td><span class="tag na">Not yet available</span></td></tr>
             <tr><td>Signed release</td><td><span class="tag na">Not yet available</span></td></tr>
             <tr><td>Independent security audit</td><td><span class="tag na">Not yet available</span></td></tr>
