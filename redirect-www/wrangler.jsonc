@@ -1,0 +1,10 @@
+// Redirect-only Worker for www.bip39.ai. The site itself is the assets-only Worker in ../wrangler.jsonc.
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "bip39-ai-www-redirect",
+  "main": "index.js",
+  "compatibility_date": "2026-09-21",
+  "routes": [{ "pattern": "www.bip39.ai", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false
+}

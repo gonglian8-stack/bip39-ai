@@ -9,6 +9,8 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
-  "workers_dev": true,
+  "routes": [{ "pattern": "bip39.ai", "custom_domain": true }],
+  // Served only on bip39.ai; www.bip39.ai is redirected by redirect-www/.
+  "workers_dev": false,
   "preview_urls": false
 }
