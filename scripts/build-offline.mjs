@@ -70,4 +70,10 @@ const patched = readFileSync(page, 'utf8')
 if (/__OFFLINE_/.test(patched)) throw new Error('unreplaced placeholder in offline page');
 writeFileSync(page, patched);
 writeFileSync(`dist/downloads/${FILE}.sha256`, `${hash}  ${FILE}\n`);
+
+// Workers static assets redirect "x.html" to "x"; pin the saved filename so the
+// download keeps its .html extension (and matches the name users verify).
+const base = FILE.replace(/\.html$/, '');
+writeFileSync('dist/_headers', readFileSync('dist/_headers', 'utf8') +
+  `\n/downloads/${base}\n  Content-Disposition: attachment; filename="${FILE}"\n`);
 console.log(`offline: ${FILE}  ${size}\nsha256: ${hash}`);
