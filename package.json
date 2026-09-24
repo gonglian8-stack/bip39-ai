@@ -15,7 +15,7 @@
     "test": "vitest run",
     "check:dist": "node scripts/check-dist.mjs",
     "typecheck": "tsc --noEmit -p .",
-    "deploy": "npm run build && npm run check:dist && wrangler pages deploy dist --project-name bip39-ai --branch main --commit-hash $(git rev-parse HEAD)"
+    "deploy": "npm run build && npm run check:dist && wrangler deploy"
   },
   "dependencies": {
     "@noble/hashes": "2.4.0",

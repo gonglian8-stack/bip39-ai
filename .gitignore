@@ -4,3 +4,4 @@ dist/
 .venv-crosscheck/
 .DS_Store
 .claude/
+.wrangler/

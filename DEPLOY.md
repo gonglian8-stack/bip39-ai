@@ -1,12 +1,15 @@
-# 部署（Cloudflare Pages）
+# 部署（Cloudflare Workers 静态资源）
 
-1. Cloudflare Pages → Create project → 连接 GitHub 仓库。
-2. Build command：`npm run build`　Output directory：`dist`
-3. Node 版本由 `.nvmrc`（24）决定；如未生效，设置环境变量 `NODE_VERSION=24`。
-4. 自定义域名绑定 `bip39.ai`。
-5. 上线后检查：
-   - 响应头包含 `Content-Security-Policy`（来自 `public/_headers`）；
-   - Cloudflare Web Analytics / Zaraz 保持关闭（否则会注入第三方脚本，违反隐私承诺）；
-   - `/sitemap.xml` 可访问，提交到 Google Search Console。
+与 27app 相同的方式：Workers Static Assets，只提供 `dist/` 静态文件，不运行服务端代码（`wrangler.jsonc` 没有 `main`）。安全头来自 `dist/_headers`。
 
-`npm run build` 会依次：从固定的上游文件生成词表与测试向量（校验 SHA-256）→ 跑全部测试 → 构建站点 → 打包离线单文件并把 SHA-256 写入 Offline 页。任一步失败则构建失败。
+```bash
+npm run deploy     # = build（含测试）→ check:dist → wrangler deploy
+```
+
+- 需要 Node ≥ 22（`.nvmrc` 为 24）。
+- 认证：`wrangler login`，或通过 `--env-file` 提供 `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`。
+- 自定义域名：在 `wrangler.jsonc` 加 `"routes": [{ "pattern": "bip39.ai", "custom_domain": true }]`，绑定前先备份 DNS 记录。
+- 不要开启 Cloudflare Web Analytics / Zaraz（会注入第三方脚本，违反隐私承诺）。
+- 上线后：`/sitemap.xml` 提交到 Google Search Console。
+
+注意：不要在本目录直接运行 `wrangler pages ...`——wrangler 会尝试“自动配置”并改写 astro.config/package.json（加 SSR 适配器）。
