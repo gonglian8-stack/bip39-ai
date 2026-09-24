@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { PAGES, TOOLS } from '../site';
+---
+<Base title="Page not found – BIP39.ai" description="This page does not exist." path="/404/" noindex>
+  <section class="page-head with-top u-pt48">
+    <h1>Page not found</h1>
+    <p class="lede">This address doesn’t exist on BIP39.ai. If you followed a link promising wallet recovery or balance checks, be careful: this site offers neither.</p>
+  </section>
+  <div class="cards three">
+    {TOOLS.map((t) => <a class="card link-card" href={t.href}><h3>{t.title}</h3><p>{t.desc}</p></a>)}
+    <a class="card link-card" href={PAGES.wordlist.href}><h3>Word List</h3><p>{PAGES.wordlist.desc}</p></a>
+    <a class="card link-card" href="/"><h3>Home</h3><p>All BIP39 tools</p></a>
+  </div>
+</Base>

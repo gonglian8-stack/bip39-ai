@@ -1,0 +1,71 @@
+---
+import Base from '../../layouts/Base.astro';
+import ToolValidator from '../../components/ToolValidator.astro';
+import OfflineAside from '../../components/OfflineAside.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES } from '../../site';
+import { appSchema, faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Validator – Check Words and Checksum';
+const description = 'Check whether a test mnemonic is valid BIP39: word count, words in the English wordlist, and checksum. Runs in your browser; nothing is sent.';
+const faq: FaqItem[] = [
+  { q: 'Does “valid” mean my wallet is safe or has funds?', a: '<p>No. Validation only confirms that the words form a correctly structured BIP39 mnemonic. It says nothing about whether a wallet was ever created from it, what it holds, who else knows it, or which derivation path a wallet uses.</p>' },
+  { q: 'Should I paste my real recovery phrase here?', a: '<p>We recommend against it. Even though nothing is sent, a website can change and your browser may run extensions that can read the page. Use the <a href="/bip39-offline/">offline file</a> on a disconnected device if you need to check a real phrase.</p>' },
+  { q: 'Why is my phrase invalid when every word is in the list?', a: '<p>The last word contains checksum bits calculated from the others. If one word is wrong, or two are in the wrong order, the checksum usually fails even though every word exists. About 1 in 16 random 12-word combinations passes by chance, so a passing checksum does not prove the words are the ones originally written down.</p>' },
+  { q: 'Does the validator support other languages?', a: '<p>Not yet. This version checks against the official English wordlist only. Other BIP39 wordlists (Japanese, Spanish, Chinese and more) are planned.</p>' },
+  { q: 'Does capitalization or extra spacing matter?', a: '<p>No. The validator trims the input, collapses spaces and line breaks, lowercases the words and applies Unicode NFKD normalization, as BIP39 specifies, before checking.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.validator.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.validator.href, title: 'Validator' }]}
+  schema={[appSchema('BIP39 Mnemonic Validator', PAGES.validator.href, description), faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>BIP39 Mnemonic Validator</h1>
+    <p class="lede">Check a test mnemonic’s word count, wordlist membership and checksum. Everything runs in your browser.</p>
+  </header>
+
+  <div class="tool-layout">
+    <ToolValidator />
+    <aside class="aside-stack" aria-label="Online and offline use">
+      <OfflineAside
+        online={['Test vectors and generated test phrases', 'Debugging your own BIP39 code', 'Learning why a phrase fails']}
+        offline={['Checking a real recovery phrase', 'Any phrase that controls funds']} />
+    </aside>
+  </div>
+
+  <article class="prose">
+    <section class="section" id="what-it-checks">
+      <h2>What the validator checks</h2>
+      <ol>
+        <li><strong>Word count</strong> — BIP39 allows 12, 15, 18, 21 or 24 words.</li>
+        <li><strong>Wordlist</strong> — every word must be in the official English list of 2048 words. Unknown words are listed by position with close matches.</li>
+        <li><strong>Checksum</strong> — the words are turned back into bits, the entropy is hashed with SHA-256, and the result must match the checksum bits carried by the last word.</li>
+      </ol>
+      <p>If the count or a word is wrong, the checksum is not evaluated, because it cannot be computed meaningfully.</p>
+    </section>
+
+    <section class="section" id="valid-is-not-safe">
+      <h2>Valid is not the same as safe</h2>
+      <p>A valid mnemonic is simply well-formed. It does not tell you whether the phrase is the one you wrote down, whether anyone else has seen it, or whether a wallet uses a <a href="/bip39-passphrase/">passphrase</a> on top of it. A single wrong word can still produce a valid-looking phrase roughly one time in sixteen for 12 words (one time in 256 for 24 words).</p>
+    </section>
+
+    <section class="section" id="common-errors">
+      <h2>Common reasons a phrase fails</h2>
+      <ul>
+        <li><strong>A misspelled word</strong>, such as <code>abandn</code>. BIP39 words are unique in their first four letters, so the suggestion is usually right.</li>
+        <li><strong>Swapped words.</strong> Order matters; swapping two words almost always breaks the checksum.</li>
+        <li><strong>A missing or extra word</strong>, giving an invalid count such as 11 or 13.</li>
+        <li><strong>A different wordlist or standard.</strong> Some wallets use other word lists or non-BIP39 schemes (for example Electrum seeds), which will not validate here.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="privacy">
+      <h2>How your input is handled</h2>
+      <p>The text box is not part of a form, so it cannot be submitted into a URL. The input is not saved to storage, not logged, and not included in any analytics — this site has none. Validation runs only when you press the button, and the box is cleared when you leave the page. Clearing resets the page; like any web page, it cannot guarantee the browser has erased every copy from memory.</p>
+    </section>
+  </article>
+
+  <Faq items={faq} />
+  <Related keys={['checksum', 'wordlist', 'generator', 'offline']} />
+</Base>

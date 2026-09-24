@@ -1,0 +1,57 @@
+---
+import Icon from './Icon.astro';
+import Notice from './Notice.astro';
+import { sizes, WORD_COUNTS } from '../lib/bip39';
+import { PAGES } from '../site';
+const s12 = sizes(12);
+---
+<section class="tool" data-tool="generator" aria-label="BIP39 mnemonic generator">
+  <div class="tool-section">
+    <fieldset class="seg">
+      <legend class="label">Word count</legend>
+      <div class="seg-options">
+        {WORD_COUNTS.map((n) => <label><input type="radio" name="gen-words" value={n} checked={n === 12} /><span>{n}</span></label>)}
+      </div>
+    </fieldset>
+    <dl class="specs" data-specs aria-live="polite">
+      <div><dt>Entropy</dt><dd data-ent>{s12.ent} bits</dd></div>
+      <div><dt>Checksum</dt><dd data-cs>{s12.cs} bits</dd></div>
+      <div><dt>Words</dt><dd data-ms>{s12.words}</dd></div>
+      <div><dt>Language</dt><dd>English</dd></div>
+    </dl>
+    <p class="small muted u-mtn6">Other wordlist languages are planned, not yet available.</p>
+    <div class="btn-row stack">
+      <button class="btn primary" type="button" data-generate><Icon name="generate" /> Generate</button>
+      <button class="btn" type="button" data-vector>Load test vector</button>
+    </div>
+    <p class="small muted u-mt8" data-vector-note hidden>The official English test vectors cover 12, 18 and 24 words only.</p>
+    <div id="gen-norandom" hidden><Notice kind="error" class="mt-0">Secure randomness (<code>crypto.getRandomValues</code>) is unavailable in this browser, so generation is disabled. Test vectors still work.</Notice></div>
+  </div>
+  <div class="tool-section" data-output-section>
+    <Notice kind="secret"><span class="online-only">Mnemonics generated on a website are for <strong>testing and learning</strong>. For a wallet that will hold funds, use a hardware wallet or the <a href={PAGES.offline.href}>offline tool</a> on a disconnected device.</span><span class="offline-only">Generate real phrases only on a trusted device with networking turned off. For significant funds, prefer a hardware wallet.</span></Notice>
+    <div class="empty" data-empty>Press <strong>Generate</strong> or <strong>Load test vector</strong> to see a mnemonic.</div>
+    <div data-result hidden>
+      <div class="output">
+        <div class="output-head">
+          <span class="label" data-mn-label>Mnemonic · 12 words</span>
+          <span class="tag" data-source>Generated</span>
+        </div>
+        <ol class="words" data-words aria-label="Mnemonic words"></ol>
+      </div>
+      <div class="output">
+        <div class="output-head"><span class="label" data-ent-label>Entropy · 128 bits (hex)</span></div>
+        <div class="hex" data-entropy></div>
+      </div>
+      <p class="small" data-cs-line></p>
+      <div class="btn-row">
+        <button class="btn sm" type="button" data-copy-mn><Icon name="copy" /> Copy mnemonic</button>
+        <button class="btn sm" type="button" data-copy-ent><Icon name="copy" /> Copy entropy</button>
+        <button class="btn sm ghost" type="button" data-regen><Icon name="refresh" /> Regenerate</button>
+        <button class="btn sm danger" type="button" data-clear>Clear</button>
+      </div>
+      <p class="clip-note">Anything you copy can be read by other apps with clipboard access.</p>
+      <p class="small u-mt14 online-only">Next: <a href={PAGES.checksum.href}>see how the checksum is built</a> · <a href={PAGES.validator.href}>validate a mnemonic</a> · <a href={PAGES.converter.href + '#mnemonic-to-seed'}>derive the seed</a></p>
+    </div>
+  </div>
+</section>
+<script>import '../scripts/generator';</script>

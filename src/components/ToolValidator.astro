@@ -1,0 +1,24 @@
+---
+import Icon from './Icon.astro';
+import SecretField from './SecretField.astro';
+---
+<section class="tool" data-tool="validator" aria-label="BIP39 mnemonic validator">
+  <div class="tool-section">
+    <SecretField id="val-input" label="Mnemonic to check" multiline rows={4} placeholder="Enter 12, 15, 18, 21 or 24 words separated by spaces">
+      <span data-count aria-live="off">0 words</span>
+      <label class="check"><input type="checkbox" data-mask /> Hide words</label>
+    </SecretField>
+    <div class="btn-row stack">
+      <button class="btn primary" type="button" data-validate><Icon name="validate" /> Validate</button>
+      <button class="btn" type="button" data-load="valid">Load valid example</button>
+      <button class="btn" type="button" data-load="invalid">Load invalid example</button>
+      <button class="btn danger" type="button" data-clear>Clear</button>
+    </div>
+    <p class="small muted u-mt10">Checks run only when you press Validate (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>).</p>
+  </div>
+  <div class="tool-section">
+    <div class="empty" data-idle>Results appear here. Word count, wordlist membership and checksum are checked locally.</div>
+    <div class="result" data-result hidden tabindex="-1"></div>
+  </div>
+</section>
+<script>import '../scripts/validator';</script>

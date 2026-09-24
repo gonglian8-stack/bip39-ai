@@ -1,0 +1,46 @@
+---
+import Trust from '../../layouts/Trust.astro';
+import { PAGES, SITE } from '../../site';
+import pkg from '../../../package.json';
+const deps = Object.entries(pkg.dependencies);
+---
+<Trust title="Open Source – BIP39.ai" description="BIP39.ai source code, license, dependencies, data sources and test results."
+  path={PAGES.openSource.href} h1="Open Source"
+  summary="The code is MIT-licensed. Here are the repository, dependencies, data sources and how correctness is tested.">
+  <h2 id="repository">Repository</h2>
+  <dl class="evidence">
+    <div><dt>Source code</dt><dd>{SITE.repoUrl ? <a href={SITE.repoUrl} rel="noopener">{SITE.repoUrl}</a> : <span class="tag na">Not yet published</span>}</dd></div>
+    <div><dt>License</dt><dd>{SITE.license}</dd></div>
+    <div><dt>Version</dt><dd class="val">{SITE.version}{SITE.commit ? ` · commit ${SITE.commit}` : ''}</dd></div>
+    <div><dt>Maintainer</dt><dd>{SITE.maintainer ? <a href={SITE.maintainer.url} rel="noopener">{SITE.maintainer.name}</a> : 'TODO'}</dd></div>
+  </dl>
+
+  <h2 id="dependencies">Runtime dependencies</h2>
+  <p>The code that runs in your browser depends on the following packages, with exact pinned versions:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Version</th><th>Used for</th></tr></thead>
+      <tbody>
+        {deps.map(([name, ver]) => <tr><td class="mono">{name}</td><td class="mono">{ver}</td><td>{
+          name === '@scure/bip39' ? 'Mnemonic encoding/decoding and seed derivation. An earlier version (1.0.0) was audited by Cure53 in January 2022; this version includes later changes not covered by that audit.'
+          : name === '@noble/hashes' ? 'SHA-256, SHA-512 and PBKDF2. Audited by Cure53 in January 2022 (an earlier version).'
+          : name === 'astro' ? 'Static site generation (build-time only; no Astro runtime ships to tool pages)'
+          : ''}</td></tr>)}
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="data">Data sources</h2>
+  <ul>
+    <li>English word list: <a href={SITE.wordlistUrl} rel="noopener">bitcoin/bips english.txt</a>, SHA-256 checked on every build.</li>
+    <li>Test vectors: <a href={SITE.vectorsUrl} rel="noopener">trezor/python-mnemonic vectors.json</a>, SHA-256 checked on every build.</li>
+  </ul>
+
+  <h2 id="tests">Tests</h2>
+  <ul>
+    <li>All 24 official English test vectors: entropy → mnemonic, mnemonic → entropy, mnemonic + “TREZOR” → seed, and the step-by-step checksum.</li>
+    <li>120 random cases across all five lengths and six passphrases (including non-ASCII) generated with the independent <code>python-mnemonic</code> 0.21 library.</li>
+    <li>40 invalid-checksum phrases that must be rejected.</li>
+    <li>Word list: identical to upstream and to the copy bundled in @scure/bip39.</li>
+  </ul>
+</Trust>

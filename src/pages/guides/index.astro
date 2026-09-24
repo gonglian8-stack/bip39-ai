@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PAGES } from '../../site';
+import { allGuides } from '../../lib/guides';
+const guides = allGuides();
+---
+<Base title="BIP39 Guides – Seed Phrases Explained" description="In-depth, source-checked articles on BIP39 seed phrases: word counts, passphrases, private keys, backups and how wallets use the standard."
+  path={PAGES.guides.href} crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.guides.href, title: 'Guides' }]}>
+  <header class="page-head">
+    <h1>BIP39 Guides</h1>
+    <p class="lede">Longer answers to common questions about seed phrases, checked against the BIP39 specification and test vectors.</p>
+  </header>
+  <ol class="guide-list">
+    {guides.map((g) => (
+      <li class="card">
+        <h2><a href={g.href}>{g.h1}</a></h2>
+        <p>{g.summary}</p>
+        <p class="small muted mb-0"><time datetime={g.updated ?? g.published}>{g.updated ?? g.published}</time></p>
+      </li>
+    ))}
+  </ol>
+</Base>

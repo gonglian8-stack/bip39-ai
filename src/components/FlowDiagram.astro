@@ -1,0 +1,28 @@
+---
+// Entropy → Mnemonic → Seed, with official test vector #1 values.
+import Icon from './Icon.astro';
+import { VECTORS, VECTOR_PASSPHRASE } from '../data/vectors';
+const v = VECTORS[0];
+---
+<figure class="mb-0 u-m0">
+  <div class="flow">
+    <div class="node">
+      <span class="label">1 · Entropy</span>
+      <div class="v">{v.entropy}</div>
+      <p>128–256 random bits</p>
+    </div>
+    <div class="arrow"><Icon name="arrow" /><span>+ SHA-256 checksum<br />→ 11-bit groups</span></div>
+    <div class="node">
+      <span class="label">2 · Mnemonic</span>
+      <div class="v">{v.mnemonic}</div>
+      <p>12–24 words you write down</p>
+    </div>
+    <div class="arrow"><Icon name="arrow" /><span>PBKDF2-HMAC-SHA512<br />2048 rounds + passphrase</span></div>
+    <div class="node">
+      <span class="label">3 · Seed</span>
+      <div class="v">{v.seed.slice(0, 32)}…</div>
+      <p>512 bits, the input to wallet key derivation</p>
+    </div>
+  </div>
+  <figcaption class="small muted u-mt8">Values from official test vector #1 (passphrase “{VECTOR_PASSPHRASE}”). <span class="tag vector">Test vector</span></figcaption>
+</figure>

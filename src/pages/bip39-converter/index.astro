@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro';
+import ToolConverter from '../../components/ToolConverter.astro';
+import OfflineAside from '../../components/OfflineAside.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES } from '../../site';
+import { appSchema, faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Converter – Entropy, Mnemonic and Seed';
+const description = 'Convert test data between BIP39 entropy, mnemonic and 512-bit seed, with an optional passphrase. Runs in your browser; no private keys are shown.';
+const faq: FaqItem[] = [
+  { q: 'Why doesn’t the converter show private keys or addresses?', a: '<p>Keys and addresses come from BIP32/BIP44-style derivation applied to the seed, which is a separate standard. Showing them would turn a learning tool into a wallet recovery tool. This page stops at the BIP39 seed.</p>' },
+  { q: 'Is the seed the same as the entropy?', a: '<p>No. Entropy is the 128–256 random bits the words encode. The seed is a 512-bit value produced by running the mnemonic and passphrase through PBKDF2-HMAC-SHA512 with 2048 iterations. You can get from entropy to mnemonic and back, but you cannot recover the mnemonic from the seed.</p>' },
+  { q: 'Why does the same mnemonic give a different seed?', a: '<p>Because of the passphrase. Every passphrase — including an empty one — produces a different, valid seed. See <a href="/bip39-passphrase/">how BIP39 passphrases work</a>.</p>' },
+  { q: 'Can I link directly to one conversion?', a: '<p>Yes: <a href="#entropy-to-mnemonic">#entropy-to-mnemonic</a>, <a href="#mnemonic-to-entropy">#mnemonic-to-entropy</a> and <a href="#mnemonic-to-seed">#mnemonic-to-seed</a>. Your input is never put in the link.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.converter.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.converter.href, title: 'Converter' }]}
+  schema={[appSchema('BIP39 Converter', PAGES.converter.href, description), faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>BIP39 Converter</h1>
+    <p class="lede">Convert test data between entropy, mnemonic and seed. Pick a direction, load a test vector or paste your own test data.</p>
+  </header>
+
+  <div class="tool-layout">
+    <ToolConverter />
+    <aside class="aside-stack" aria-label="Online and offline use">
+      <OfflineAside
+        online={['Checking your implementation against test vectors', 'Learning how entropy, words and seed relate']}
+        offline={['Converting a real mnemonic or passphrase', 'Anything that controls funds']} />
+    </aside>
+  </div>
+
+  <article class="prose">
+    <section class="section" id="how-it-fits">
+      <h2>Entropy, mnemonic and seed</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Value</th><th>Size</th><th>How it’s made</th><th>Reversible?</th></tr></thead>
+          <tbody>
+            <tr><td>Entropy</td><td>128–256 bits</td><td>Random bits</td><td>—</td></tr>
+            <tr><td>Mnemonic</td><td>12–24 words</td><td>Entropy + SHA-256 checksum, split into 11-bit word indexes</td><td>Yes, back to entropy</td></tr>
+            <tr><td>Seed</td><td>512 bits</td><td>PBKDF2-HMAC-SHA512(mnemonic, "mnemonic" + passphrase, 2048 iterations)</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="how-to-use">
+      <h2>How to use the converter</h2>
+      <ol>
+        <li>Choose a direction with the tabs at the top of the tool.</li>
+        <li>Enter test data or press <strong>Load test vector</strong> to use official vector #1.</li>
+        <li>Press <strong>Convert</strong> (or <strong>Derive seed</strong>). Errors explain which part of the input is wrong.</li>
+        <li>Switching tabs or pressing <strong>Clear</strong> empties that mode’s input and output.</li>
+      </ol>
+    </section>
+
+    <section class="section" id="limits">
+      <h2>What this converter does not do</h2>
+      <ul>
+        <li>It does not derive private keys, extended keys (xprv) or addresses.</li>
+        <li>It does not check balances or connect to any blockchain or API.</li>
+        <li>It does not recover missing words or guess passphrases.</li>
+      </ul>
+      <p>BIP39 ends at the seed. How a wallet turns the seed into keys is defined by other standards such as BIP32 and BIP44.</p>
+    </section>
+  </article>
+
+  <Faq items={faq} />
+  <Related keys={['passphrase', 'checksum', 'generator', 'offline']} />
+</Base>

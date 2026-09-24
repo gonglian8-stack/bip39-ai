@@ -1,0 +1,76 @@
+---
+import Icon from './Icon.astro';
+import SecretField from './SecretField.astro';
+interface Props { headingLevel?: 'h2' | 'h3' }
+const { headingLevel = 'h2' } = Astro.props;
+const H = headingLevel;
+const MODES = [
+  { id: 'entropy-to-mnemonic', short: 'Entropy → Mnemonic' },
+  { id: 'mnemonic-to-entropy', short: 'Mnemonic → Entropy' },
+  { id: 'mnemonic-to-seed', short: 'Mnemonic → Seed' },
+];
+---
+<section class="tool" data-tool="converter" aria-label="BIP39 converter">
+  <div class="tabbar">
+    <fieldset class="seg full mb-0">
+      <legend class="label">Conversion</legend>
+      <div class="seg-options">
+        {MODES.map((m, i) => <label><input type="radio" name="conv-mode" value={m.id} checked={i === 0} aria-controls={`panel-${m.id}`} /><span>{m.short}</span></label>)}
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="tabpanel" id="panel-entropy-to-mnemonic" data-panel="entropy-to-mnemonic">
+    <H id="entropy-to-mnemonic"><a href="#entropy-to-mnemonic">Entropy to mnemonic</a></H>
+    <p class="small muted">Encode 128–256 bits of hex entropy (32, 40, 48, 56 or 64 hex characters) as BIP39 words.</p>
+    <SecretField id="conv-ent" label="Entropy (hex)" placeholder="e.g. 00000000000000000000000000000000" />
+    <div class="btn-row stack">
+      <button class="btn primary" type="button" data-run><Icon name="convert" /> Convert</button>
+      <button class="btn" type="button" data-vector>Load test vector</button>
+      <button class="btn danger" type="button" data-clear>Clear</button>
+    </div>
+    <div class="output u-mt16" data-out hidden>
+      <div class="output-head"><span class="label" data-out-label>Mnemonic</span><button class="btn sm ghost" type="button" data-copy><Icon name="copy" /> Copy</button></div>
+      <ol class="words" data-words></ol>
+    </div>
+  </div>
+
+  <div class="tabpanel" id="panel-mnemonic-to-entropy" data-panel="mnemonic-to-entropy" hidden>
+    <H id="mnemonic-to-entropy"><a href="#mnemonic-to-entropy">Mnemonic to entropy</a></H>
+    <p class="small muted">Decode a mnemonic back to its original entropy. The checksum must be valid.</p>
+    <SecretField id="conv-mn" label="Mnemonic" multiline rows={3} placeholder="12–24 words separated by spaces" />
+    <div class="btn-row stack">
+      <button class="btn primary" type="button" data-run><Icon name="convert" /> Convert</button>
+      <button class="btn" type="button" data-vector>Load test vector</button>
+      <button class="btn danger" type="button" data-clear>Clear</button>
+    </div>
+    <div class="output u-mt16" data-out hidden>
+      <div class="output-head"><span class="label" data-out-label>Entropy (hex)</span><button class="btn sm ghost" type="button" data-copy><Icon name="copy" /> Copy</button></div>
+      <div class="hex" data-hex></div>
+    </div>
+  </div>
+
+  <div class="tabpanel" id="panel-mnemonic-to-seed" data-panel="mnemonic-to-seed" hidden>
+    <H id="mnemonic-to-seed"><a href="#mnemonic-to-seed">Mnemonic to seed</a></H>
+    <p class="small muted">Derive the 512-bit BIP39 seed with PBKDF2-HMAC-SHA512 (2048 iterations, salt <code>"mnemonic" + passphrase</code>). No private keys or addresses are shown.</p>
+    <SecretField id="conv-seed-mn" label="Mnemonic" multiline rows={3} placeholder="12–24 words separated by spaces" />
+    <SecretField id="conv-pp" label="Passphrase (optional)" password note={false} placeholder="Leave empty for no passphrase">
+      <label class="check"><input type="checkbox" data-show-pp /> Show passphrase</label>
+      <span>Case-sensitive. Normalized with Unicode NFKD.</span>
+    </SecretField>
+    <div class="btn-row stack">
+      <button class="btn primary" type="button" data-run><Icon name="convert" /> Derive seed</button>
+      <button class="btn" type="button" data-vector>Load test vector</button>
+      <button class="btn danger" type="button" data-clear>Clear</button>
+    </div>
+    <div class="u-mt16" data-out hidden>
+      <div class="output">
+        <div class="output-head"><span class="label">Seed · 512 bits (hex)</span><button class="btn sm ghost" type="button" data-copy><Icon name="copy" /> Copy</button></div>
+        <div class="hex" data-hex></div>
+      </div>
+      <dl class="kv"><dt>Fingerprint</dt><dd data-fp></dd><dt>Passphrase</dt><dd data-pp-state></dd></dl>
+      <p class="clip-note">Fingerprint = first 8 hex characters of SHA-256(seed), for comparing seeds at a glance.</p>
+    </div>
+  </div>
+</section>
+<script>import '../scripts/converter';</script>

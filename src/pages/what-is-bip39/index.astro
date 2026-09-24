@@ -1,0 +1,133 @@
+---
+import Base from '../../layouts/Base.astro';
+import FlowDiagram from '../../components/FlowDiagram.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES, SITE } from '../../site';
+import { sizes, WORD_COUNTS } from '../../lib/bip39';
+import { faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'What Is BIP39? Mnemonic Phrases Explained';
+const description = 'BIP39 turns random numbers into 12–24 word recovery phrases and derives a wallet seed from them. A plain-language guide with diagrams and live examples.';
+const toc = [
+  ['definition', 'Definition'], ['how-it-works', 'How it works'], ['solves', 'What BIP39 solves'], ['not', 'What it does not do'],
+  ['lengths', 'Word counts and entropy'], ['checksum', 'The checksum'], ['passphrase', 'The passphrase'],
+  ['bip32', 'BIP39 vs BIP32 and BIP44'], ['safety', 'Safety advice'], ['sources', 'Sources'],
+];
+const faq: FaqItem[] = [
+  { q: 'Is a seed phrase the same as a BIP39 mnemonic?', a: '<p>In everyday use, yes: “seed phrase”, “recovery phrase” and “mnemonic” usually mean the BIP39 word list. Strictly, the <em>seed</em> is the 512-bit value derived from the phrase.</p>' },
+  { q: 'Do all wallets use BIP39?', a: '<p>Most do, but not all. Some wallets use their own schemes (for example Electrum’s seed format, or Monero’s 25-word phrases), which are not interchangeable with BIP39.</p>' },
+  { q: 'Can two people get the same mnemonic?', a: '<p>With properly random 128-bit entropy, the chance is negligible — there are 2<sup>128</sup> possible 12-word phrases.</p>' },
+  { q: 'Does BIP39 encrypt anything?', a: '<p>No. It encodes randomness as words and derives a seed. Anyone who has the words (and passphrase, if used) can recreate the seed.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.what.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.what.href, title: 'What Is BIP39?' }]}
+  schema={[{ '@type': 'Article', headline: 'What Is BIP39?', description, dateModified: SITE.lastReviewed, mainEntityOfPage: new URL(PAGES.what.href, SITE.url).href }, faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>What Is BIP39?</h1>
+  </header>
+  <div class="content-layout">
+    <article class="prose">
+      <section id="definition">
+        <p class="u-lead"><strong>BIP39 is a standard for turning random data into a list of 12 to 24 common English words, and for turning those words into a 512-bit seed that a wallet uses to create keys.</strong> The words are easier to write down and check than a long number, and a built-in checksum catches most mistakes.</p>
+        <p class="small muted">BIP stands for Bitcoin Improvement Proposal. BIP39 was proposed in 2013 and is now used by most cryptocurrency wallets, not only Bitcoin ones. Last reviewed {SITE.lastReviewed}.</p>
+      </section>
+
+      <section class="section" id="how-it-works">
+        <h2>How BIP39 works</h2>
+        <FlowDiagram />
+        <ol class="u-mt20">
+          <li><strong>Entropy.</strong> A wallet picks 128–256 random bits. Try it in the <a href="/bip39-generator/">generator</a>.</li>
+          <li><strong>Checksum.</strong> It hashes those bits with SHA-256 and appends the first few bits of the hash.</li>
+          <li><strong>Words.</strong> The bits are split into 11-bit numbers, each selecting one of <a href="/bip39-word-list/">2048 words</a>.</li>
+          <li><strong>Seed.</strong> The words, plus an optional passphrase, go through PBKDF2-HMAC-SHA512 with 2048 rounds to produce a 512-bit seed. See it in the <a href="/bip39-converter/#mnemonic-to-seed">converter</a>.</li>
+        </ol>
+      </section>
+
+      <section class="section" id="solves">
+        <h2>What BIP39 solves</h2>
+        <ul>
+          <li><strong>Human-friendly backups.</strong> Twelve words are easier to write, read aloud and check than 32 hex characters.</li>
+          <li><strong>Error detection.</strong> A checksum makes most typos fail instead of restoring the wrong wallet.</li>
+          <li><strong>Portability.</strong> Any wallet that implements BIP39 (and the same derivation paths) can restore the same funds.</li>
+        </ul>
+      </section>
+
+      <section class="section" id="not">
+        <h2>What BIP39 does not do</h2>
+        <ul>
+          <li>It does not encrypt or hide the words. Whoever has them controls the funds.</li>
+          <li>It does not define how keys or addresses are made from the seed — that is BIP32, BIP44 and related standards.</li>
+          <li>It does not guarantee randomness. A weak random source gives a weak phrase with a perfectly valid checksum.</li>
+          <li>It cannot tell you whether a phrase has funds or which wallet created it.</li>
+        </ul>
+      </section>
+
+      <section class="section" id="lengths">
+        <h2>Word counts and entropy</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Words</th><th>Entropy bits</th><th>Checksum bits</th><th>Possible phrases</th></tr></thead>
+            <tbody>
+              {WORD_COUNTS.map((n) => { const s = sizes(n); return <tr><td>{n}</td><td class="mono">{s.ent}</td><td class="mono">{s.cs}</td><td class="mono">2<sup>{s.ent}</sup></td></tr>; })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="checksum">
+        <h2>The checksum</h2>
+        <p>The checksum is the first ENT/32 bits of SHA-256(entropy): 4 bits for 12 words, 8 bits for 24. It lives in the last word, which is why you can’t pick the last word freely. The <a href="/bip39-checksum/">checksum page</a> walks through every step with real test vectors.</p>
+      </section>
+
+      <section class="section" id="passphrase">
+        <h2>The optional passphrase</h2>
+        <p>BIP39 lets you add a passphrase, sometimes called the “25th word”. Every passphrase produces a different valid seed, so a typo opens a different empty wallet instead of showing an error. <a href="/bip39-passphrase/">Try it with a test vector</a>.</p>
+      </section>
+
+      <section class="section" id="bip32">
+        <h2>BIP39 vs BIP32 and BIP44</h2>
+        <p>These standards are often mentioned together but do different jobs:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Standard</th><th>Job</th></tr></thead>
+            <tbody>
+              <tr><td>BIP39</td><td>Random bits ↔ words; words + passphrase → seed</td></tr>
+              <tr><td>BIP32</td><td>Seed → a tree of keys (hierarchical deterministic wallets)</td></tr>
+              <tr><td>BIP44, 49, 84, 86</td><td>Which branch of that tree a wallet uses for each coin and address type (the “derivation path”)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Two wallets can use the same BIP39 phrase and still show different addresses if they use different derivation paths.</p>
+      </section>
+
+      <section class="section" id="safety">
+        <h2>Safety advice</h2>
+        <ul>
+          <li>Let a hardware wallet or a trusted offline tool generate your phrase. Don’t invent words yourself.</li>
+          <li>Never type a real recovery phrase into a website, chat, email, cloud note or photo. Legitimate support will never ask for it.</li>
+          <li>Store backups offline; consider a metal backup for fire and water resistance.</li>
+          <li>If you use a passphrase, back it up separately with the same care.</li>
+          <li>To experiment, use test vectors or the <a href="/bip39-offline/">offline tool</a>.</li>
+        </ul>
+      </section>
+
+      <section class="section" id="sources">
+        <h2>Sources</h2>
+        <ul>
+          <li><a href={SITE.specUrl} rel="noopener">BIP39 specification</a> (bitcoin/bips)</li>
+          <li><a href={SITE.wordlistUrl} rel="noopener">Official English word list</a></li>
+          <li><a href={SITE.vectorsUrl} rel="noopener">Official test vectors</a> (trezor/python-mnemonic)</li>
+        </ul>
+      </section>
+    </article>
+    <nav class="toc" aria-label="On this page">
+      <p class="label">On this page</p>
+      <ol>{toc.map(([id, t]) => <li><a href={`#${id}`}>{t}</a></li>)}</ol>
+    </nav>
+  </div>
+
+  <Faq items={faq} />
+  <Related keys={['generator', 'checksum', 'passphrase']} />
+</Base>

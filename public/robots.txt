@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bip39.ai/sitemap.xml

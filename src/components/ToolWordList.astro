@@ -1,0 +1,47 @@
+---
+import Icon from './Icon.astro';
+import { WORDLIST, DOWNLOADS } from '../data/wordlist-english';
+interface Props { downloads?: boolean }
+const { downloads = true } = Astro.props;
+---
+<section class="tool" data-tool="wordlist" aria-label="BIP39 English word list">
+  <div class="tool-section">
+    <div class="wl-bar">
+      <div>
+        <label class="label" for="wl-search">Search by word or number</label>
+        <input id="wl-search" class="field" type="search" placeholder="e.g. aban, zoo, 0, 2048" autocomplete="off" spellcheck="false" />
+      </div>
+      <fieldset class="seg mb-0">
+        <legend class="label">View</legend>
+        <div class="seg-options">
+          <label><input type="radio" name="wl-view" value="grid" checked /><span>Grid</span></label>
+          <label><input type="radio" name="wl-view" value="list" /><span>List</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <p class="small muted u-mb12" data-status aria-live="polite">Showing all 2048 words. Numbers are 1–2048; the 11-bit index is 0–2047. Click a word to copy it.</p>
+    <a class="visually-hidden skip-wl" href="#after-wordlist">Skip the word list</a>
+    <ol class="wl-list" data-list>
+      {WORDLIST.map((w, i) => (
+        <li><button type="button"><span class="n">{i + 1}</span><span class="w">{w}</span></button></li>
+      ))}
+    </ol>
+    <p class="empty" data-none hidden></p>
+    <span id="after-wordlist" tabindex="-1"></span>
+  </div>
+  {downloads && (
+    <div class="tool-section" id="download">
+      <h2 class="mt-0 u-fs20">Download</h2>
+      <div class="downloads">
+        {Object.entries(DOWNLOADS).map(([name, meta]) => (
+          <div class="dl-row">
+            <a class="btn sm" href={`/wordlist/${name}`} download={`bip39-${name}`}><Icon name="download" /> {name.split('.')[1].toUpperCase()}</a>
+            <span class="small">{name === 'english.txt' ? 'Identical to the upstream file, one word per line' : name === 'english.json' ? 'JSON array of 2048 strings' : 'index, 1-based number, 11-bit binary, word'} · {(meta.bytes / 1024).toFixed(1)} KB</span>
+            <span class="hash">SHA-256 {meta.sha256}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
+<script>import '../scripts/wordlist';</script>

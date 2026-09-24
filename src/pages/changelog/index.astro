@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PAGES } from '../../site';
+import { CHANGELOG } from '../../data/changelog';
+---
+<Base title="Changelog – BIP39.ai" description="Release notes for BIP39.ai: new tools, content, fixes and changes to the offline file, newest first."
+  path={PAGES.changelog.href} crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.changelog.href, title: 'Changelog' }]}>
+  <header class="page-head">
+    <h1>Changelog</h1>
+    <p class="lede">Every release that changes a tool, the offline file or published content. The current offline file’s hash is on the <a href={PAGES.offline.href}>Offline page</a>.</p>
+  </header>
+  <div class="prose">
+    {CHANGELOG.map((r) => (
+      <section class="section" id={`v${r.version}`}>
+        <h2><a href={`#v${r.version}`}>v{r.version}</a> <span class="small muted">· <time datetime={r.date}>{r.date}</time></span></h2>
+        <ul>{r.changes.map((c) => <li>{c}</li>)}</ul>
+      </section>
+    ))}
+  </div>
+</Base>

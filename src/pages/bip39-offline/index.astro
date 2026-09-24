@@ -1,0 +1,120 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Notice from '../../components/Notice.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES, SITE } from '../../site';
+import { faqSchema, type FaqItem } from '../../lib/schema';
+
+// Replaced by scripts/build-offline.mjs after the standalone file is built.
+const SHA = '__OFFLINE_SHA256__';
+const SIZE = '__OFFLINE_SIZE__';
+const DATE = '__OFFLINE_DATE__';
+const file = SITE.offlineFile;
+const title = 'Offline BIP39 Tool – Download Standalone HTML';
+const description = 'Download a single HTML file with the BIP39 generator, validator, converter, checksum and word list. Verify its SHA-256 and run it with no network connection.';
+const faq: FaqItem[] = [
+  { q: 'Why not just use the website with Wi-Fi off?', a: '<p>That helps, but the code still came from a server at that moment. A downloaded file can be checked against a published hash, kept, and reused — so you know exactly which code is running.</p>' },
+  { q: 'Does the offline file protect me from malware?', a: '<p>No. If the computer is compromised, malware can read the screen, keyboard or clipboard. For real funds, a dedicated clean device or a hardware wallet is safer.</p>' },
+  { q: 'Which browsers does it work in?', a: '<p>Current versions of Chrome, Edge, Firefox and Safari. It needs JavaScript and the Web Crypto API, which modern browsers provide even for local files.</p>' },
+  { q: 'Is the hash on this page enough to trust the file?', a: '<p>It proves the file matches what this page publishes. If an attacker controlled this website, they could change both. Compare the hash with the one in the source repository release as a second, independent channel once that is available.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.offline.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.offline.href, title: 'Offline' }]}
+  schema={[{ '@type': 'SoftwareApplication', name: 'BIP39.ai Offline', softwareVersion: SITE.version, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Any (web browser)', license: 'https://opensource.org/licenses/MIT', downloadUrl: `${SITE.url}/downloads/${file}`, fileSize: SIZE, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } }, faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>Offline BIP39 Tool</h1>
+    <p class="lede">One HTML file with the generator, validator, converter, checksum and word list. Download it, check its hash, and open it with networking off.</p>
+  </header>
+
+  <div class="tool-layout">
+    <section class="card" aria-labelledby="release-h">
+      <h2 class="u-fs20" id="release-h">Current release</h2>
+      <dl class="evidence">
+        <div><dt>File</dt><dd class="val">{file}</dd></div>
+        <div><dt>Version</dt><dd class="val">{SITE.version}{SITE.commit ? ` · commit ${SITE.commit}` : ''}</dd></div>
+        <div><dt>Size</dt><dd class="val" data-size>{SIZE}</dd></div>
+        <div><dt>Built</dt><dd class="val">{DATE}</dd></div>
+        <div><dt>SHA-256</dt><dd><span class="val" data-sha>{SHA}</span> <button class="btn sm ghost" type="button" data-copy-sha><Icon name="copy" /> Copy</button></dd></div>
+      </dl>
+      <div class="btn-row u-mt16">
+        <a class="btn primary" href={`/downloads/${file}`} download={file}><Icon name="download" /> Download standalone HTML</a>
+        {SITE.repoUrl ? <a class="btn" href={SITE.repoUrl} rel="noopener"><Icon name="github" /> View source</a> : <a class="btn" href={PAGES.openSource.href}>View source status</a>}
+      </div>
+    </section>
+    <aside class="card aside-card" aria-labelledby="inside-h">
+      <h2 id="inside-h">What’s inside</h2>
+      <ul>
+        <li><span class="mk y" aria-hidden="true">✓</span><span>Generator, Validator, Converter, Checksum, Word List</span></li>
+        <li><span class="mk y" aria-hidden="true">✓</span><span>All code, styles and the 2048-word list inlined</span></li>
+        <li><span class="mk y" aria-hidden="true">✓</span><span>Content Security Policy with <code>connect-src 'none'</code></span></li>
+        <li><span class="mk y" aria-hidden="true">✓</span><span>No fonts, CDNs, analytics or dynamic imports</span></li>
+      </ul>
+    </aside>
+  </div>
+  <script>import '../../scripts/offline-page';</script>
+
+  <article class="prose">
+    <section class="section" id="verify">
+      <h2>1. Verify the download</h2>
+      <p>Compute the file’s SHA-256 and compare it with the value above. They must match exactly.</p>
+      <h3>macOS or Linux</h3>
+      <pre><code>shasum -a 256 {file}</code></pre>
+      <h3>Windows (PowerShell)</h3>
+      <pre><code>Get-FileHash .\{file} -Algorithm SHA256</code></pre>
+      <p class="small muted">If they differ, delete the file and do not open it.</p>
+    </section>
+
+    <section class="section" id="use-offline">
+      <h2>2. Use it offline</h2>
+      <ol>
+        <li>Turn off Wi-Fi and unplug network cables (or use airplane mode).</li>
+        <li>Open the file by double-clicking it, or drag it into a browser window. It opens as a <code>file://</code> page.</li>
+        <li>Check the badge at the top reads <strong>Offline build v{SITE.version}</strong>.</li>
+        <li>When finished, close the tab and browser before reconnecting.</li>
+      </ol>
+      <Notice kind="info">Consider a private/incognito window: most browsers disable extensions there unless you have allowed them.</Notice>
+    </section>
+
+    <section class="section" id="confirm-no-network">
+      <h2>3. Confirm there are no network requests</h2>
+      <ol>
+        <li>Open developer tools (<kbd>F12</kbd>, or <kbd>⌥ ⌘ I</kbd> on macOS) and select <strong>Network</strong>.</li>
+        <li>Reload the page and use each tool.</li>
+        <li>The list should contain only the file itself. The file’s Content Security Policy also blocks connections, which you can read in its first lines.</li>
+      </ol>
+    </section>
+
+    <section class="section" id="evidence">
+      <h2>Release evidence</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>SHA-256 published</td><td><span class="tag ok">Yes</span> on this page</td></tr>
+            <tr><td>Official test vectors</td><td><span class="tag ok">Pass</span> 24/24 English vectors, checked on every build</td></tr>
+            <tr><td>Independent implementation cross-check</td><td><span class="tag ok">Pass</span> 120 cases vs python-mnemonic 0.21</td></tr>
+            <tr><td>Source tag for this release</td><td>{SITE.repoUrl ? <a href={SITE.repoUrl} rel="noopener">View</a> : <span class="tag na">Not yet available</span>}</td></tr>
+            <tr><td>Reproducible build</td><td><span class="tag na">Not yet available</span></td></tr>
+            <tr><td>Signed release</td><td><span class="tag na">Not yet available</span></td></tr>
+            <tr><td>Independent security audit</td><td><span class="tag na">Not yet available</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="limits">
+      <h2>Limitations</h2>
+      <ul>
+        <li>It cannot protect against an infected computer, malicious browser extensions, screen recording or clipboard monitoring.</li>
+        <li>Clearing a field resets the page, but JavaScript cannot guarantee every copy is erased from memory. Close the browser when done.</li>
+        <li>It does not derive private keys or addresses and cannot recover wallets.</li>
+      </ul>
+    </section>
+  </article>
+
+  <Faq items={faq} />
+  <Related keys={['security', 'openSource', 'generator']} />
+</Base>

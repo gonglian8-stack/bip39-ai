@@ -1,0 +1,29 @@
+{
+  "name": "bip39-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "prebuild": "node scripts/gen-wordlist-files.mjs && vitest run",
+    "build": "astro build && node scripts/build-offline.mjs",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "check:dist": "node scripts/check-dist.mjs",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "@scure/bip39": "2.4.0",
+    "astro": "7.3.4"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.1"
+  }
+}

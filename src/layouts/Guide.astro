@@ -1,0 +1,30 @@
+---
+import Base from './Base.astro';
+import Related from '../components/Related.astro';
+import { PAGES, SITE } from '../site';
+import type { GuideFrontmatter } from '../lib/guides';
+interface Props { frontmatter: GuideFrontmatter; url?: string }
+const { frontmatter: fm } = Astro.props;
+const path = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : Astro.url.pathname + '/';
+const date = fm.updated ?? fm.published;
+---
+<Base title={fm.title} description={fm.description} path={path}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.guides.href, title: 'Guides' }, { href: path, title: fm.h1 }]}
+  schema={[{
+    '@type': 'Article', headline: fm.h1, description: fm.description,
+    datePublished: fm.published, dateModified: date,
+    mainEntityOfPage: new URL(path, SITE.url).href,
+    ...(SITE.maintainer ? { author: { '@type': 'Person', name: SITE.maintainer.name, url: SITE.maintainer.url } } : {}),
+  }]}>
+  <header class="page-head">
+    <h1>{fm.h1}</h1>
+    <p class="lede">{fm.summary}</p>
+    <p class="small muted u-mt8">
+      Published <time datetime={fm.published}>{fm.published}</time>
+      {fm.updated && <> · Updated <time datetime={fm.updated}>{fm.updated}</time></>}
+      {SITE.maintainer && <> · By <a href={SITE.maintainer.url} rel="noopener">{SITE.maintainer.name}</a></>}
+    </p>
+  </header>
+  <article class="prose guide"><slot /></article>
+  {fm.related && fm.related.length > 0 && <Related keys={fm.related} title="Try it" />}
+</Base>

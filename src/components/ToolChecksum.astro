@@ -1,0 +1,33 @@
+---
+import Icon from './Icon.astro';
+import { checksumSteps, hexToBytes, WORD_COUNTS } from '../lib/bip39';
+import { VECTORS } from '../data/vectors';
+import { checksumStepsHtml } from '../lib/render';
+const initial = checksumSteps(hexToBytes(VECTORS[0].entropy));
+---
+<section class="tool" data-tool="checksum" aria-label="BIP39 checksum calculator">
+  <div class="tool-section">
+    <div class="u-autogrid">
+      <div>
+        <label class="label" for="cs-vector">Official test vector</label>
+        <select id="cs-vector" class="field">
+          {VECTORS.map((v) => <option value={v.id}>#{v.id} · {v.entropy.length * 4} bits · {v.entropy.slice(0, 8)}…</option>)}
+        </select>
+      </div>
+      <div>
+        <span class="label" id="cs-rand-l">Or random test entropy</span>
+        <div class="btn-row">
+          <select class="field u-wauto" data-rand-words aria-labelledby="cs-rand-l">
+            {WORD_COUNTS.map((n) => <option value={n}>{n} words</option>)}
+          </select>
+          <button class="btn" type="button" data-random><Icon name="refresh" /> Generate</button>
+        </div>
+      </div>
+    </div>
+    <p class="small muted u-mt12">Source: <span class="tag vector" data-src>Test vector #1</span> This page never asks for your own mnemonic.</p>
+  </div>
+  <div class="tool-section">
+    <ol class="steps" data-steps aria-live="polite" set:html={checksumStepsHtml(initial)} />
+  </div>
+</section>
+<script>import '../scripts/checksum';</script>

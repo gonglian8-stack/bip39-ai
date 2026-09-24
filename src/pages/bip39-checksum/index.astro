@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import ToolChecksum from '../../components/ToolChecksum.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES } from '../../site';
+import { sizes, WORD_COUNTS } from '../../lib/bip39';
+import { appSchema, faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Checksum Explained – Step-by-Step Calculator';
+const description = 'See how a BIP39 checksum is calculated: entropy, SHA-256, checksum bits, 11-bit groups and words, using official test vectors.';
+const faq: FaqItem[] = [
+  { q: 'Why is the last word of a mnemonic not random?', a: '<p>Part of the last word’s 11 bits are checksum bits calculated from all the other bits. For 12 words, 7 bits of the last word are entropy and 4 are checksum, so only 128 of the 2048 words are valid in that position for any given first 11 words.</p>' },
+  { q: 'Can I calculate the last word of my own phrase here?', a: '<p>No. This page only uses official test vectors or fresh random test entropy. Choosing words yourself and computing a last word produces weak, human-chosen entropy. A dedicated last-word tool may be added later as an offline-only feature.</p>' },
+  { q: 'Is the checksum hashed from the hex text or the bytes?', a: '<p>From the raw entropy bytes. Hashing the hex string is a common implementation bug; the test vectors on this page let you check your code.</p>' },
+  { q: 'How strong is the checksum?', a: '<p>It is a typo check, not a security feature: 4 bits for 12 words (1 in 16 chance a random error passes) up to 8 bits for 24 words (1 in 256).</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.checksum.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.checksum.href, title: 'Checksum' }]}
+  schema={[appSchema('BIP39 Checksum Calculator', PAGES.checksum.href, description), faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>BIP39 Checksum</h1>
+    <p class="lede">The checksum is the first ENT/32 bits of SHA-256(entropy), stored in the last word. Follow each step below with an official test vector.</p>
+  </header>
+
+  <ToolChecksum />
+
+  <div class="content-layout">
+    <article class="prose">
+      <section class="section" id="how-it-works">
+        <h2>How the BIP39 checksum works</h2>
+        <p>BIP39 defines two formulas:</p>
+        <p><span class="formula">CS = ENT / 32</span> <span class="formula">MS = (ENT + CS) / 11</span></p>
+        <p>ENT is the entropy length in bits, CS the checksum length in bits, and MS the mnemonic length in words. Taking the first CS bits of the SHA-256 hash and appending them to the entropy makes the total a multiple of 11, so it splits exactly into word indexes.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ENT</th><th>CS</th><th>ENT + CS</th><th>Words (MS)</th><th>Checksum bits in last word</th></tr></thead>
+            <tbody>
+              {WORD_COUNTS.map((n) => { const s = sizes(n); return <tr><td class="mono">{s.ent}</td><td class="mono">{s.cs}</td><td class="mono">{s.total}</td><td class="mono">{n}</td><td class="mono">{s.cs} of 11</td></tr>; })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="why">
+        <h2>What the checksum is for</h2>
+        <p>The checksum catches most transcription mistakes: a wrong word, a swapped pair, a missing word. Wallets refuse to import a mnemonic whose checksum fails, which prevents silently restoring the wrong wallet from a typo.</p>
+        <p>It is not encryption and adds no security. Anyone with the words can recompute it.</p>
+      </section>
+
+      <section class="section" id="implementation">
+        <h2>Implementation notes</h2>
+        <ul>
+          <li>Hash the entropy <em>bytes</em>, not the hex string.</li>
+          <li>Take bits from the most significant bit of the first hash byte.</li>
+          <li>Read 11-bit groups big-endian: the first bit is the most significant bit of the index.</li>
+          <li>Check your implementation against all 24 English vectors in the <a href="https://github.com/trezor/python-mnemonic/blob/master/vectors.json" rel="noopener">official test vectors</a>. You can step through each of them above.</li>
+        </ul>
+        <p>To check a complete mnemonic, use the <a href="/bip39-validator/">validator</a>. To produce new test mnemonics, use the <a href="/bip39-generator/">generator</a>.</p>
+      </section>
+    </article>
+  </div>
+
+  <Faq items={faq} />
+  <Related keys={['generator', 'validator', 'wordlist', 'what']} />
+</Base>

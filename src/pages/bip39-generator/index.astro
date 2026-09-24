@@ -1,0 +1,90 @@
+---
+import Base from '../../layouts/Base.astro';
+import ToolGenerator from '../../components/ToolGenerator.astro';
+import OfflineAside from '../../components/OfflineAside.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES } from '../../site';
+import { sizes, WORD_COUNTS } from '../../lib/bip39';
+import { appSchema, faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Generator – 12 to 24 Word Test Mnemonics';
+const description = 'Generate a valid 12, 15, 18, 21 or 24-word BIP39 test mnemonic in your browser and see its entropy and checksum. Nothing is sent or stored.';
+const faq: FaqItem[] = [
+  { q: 'Can I use a mnemonic generated here for a real wallet?', a: '<p>We don’t recommend it. The generator uses your browser’s secure random number generator, but any website can be changed by whoever controls its server, and your device may have extensions or malware that read the page. For a wallet that will hold funds, let a hardware wallet generate the phrase, or use the <a href="/bip39-offline/">verified offline file</a> on a disconnected device.</p>' },
+  { q: 'Can I choose my own 12 words?', a: '<p>Not freely. The last word contains checksum bits calculated from the others, so most hand-picked combinations are invalid. More importantly, words chosen by a person are far less random than 128 bits of machine entropy. <a href="/bip39-checksum/">See how the checksum works</a>.</p>' },
+  { q: 'Are 12 words enough, or should I use 24?', a: '<p>12 words encode 128 bits of entropy, which is beyond practical brute force. 24 words encode 256 bits. Both are valid BIP39; the choice is usually set by the wallet. More words make the backup longer to write and check.</p>' },
+  { q: 'Why can’t I type in my own randomness?', a: '<p>Text you type, dice you describe incorrectly or phrases you remember are easy to get wrong and hard to verify. This tool only uses <code>crypto.getRandomValues</code>, the browser’s cryptographically secure generator. If it is unavailable, generation is disabled instead of falling back to something weaker.</p>' },
+  { q: 'Does this site keep a copy of the mnemonic?', a: '<p>No. Generation happens in your browser; the result is not sent, logged, stored or placed in the URL, and it is cleared when you leave the page. You can confirm there are no network requests in your browser’s developer tools. See the <a href="/security/">security model</a>.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.generator.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.generator.href, title: 'Generator' }]}
+  schema={[appSchema('BIP39 Mnemonic Generator', PAGES.generator.href, description), faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>BIP39 Mnemonic Generator</h1>
+    <p class="lede">Generate a valid 12–24 word BIP39 test mnemonic in your browser and see the entropy and checksum behind it.</p>
+  </header>
+
+  <div class="tool-layout">
+    <ToolGenerator />
+    <aside class="aside-stack" aria-label="Online and offline use">
+      <OfflineAside
+        online={['Learning how BIP39 works', 'Test data for development', 'Checking word counts and sizes']}
+        offline={['Creating a phrase for a wallet that will hold funds', 'Anything you would not want to lose']} />
+    </aside>
+  </div>
+
+  <div class="content-layout">
+    <article class="prose">
+      <section class="section" id="how-to-use">
+        <h2>How to use the generator</h2>
+        <ol>
+          <li>Choose a word count. The boxes show how many bits of entropy and checksum that length uses.</li>
+          <li>Press <strong>Generate</strong> for fresh random entropy, or <strong>Load test vector</strong> for an official, reproducible example.</li>
+          <li>Read the mnemonic and its entropy. The last bits of the final word are the checksum.</li>
+          <li>Copy it into your test project, or press <strong>Clear</strong>. It is erased when you leave the page.</li>
+        </ol>
+      </section>
+
+      <section class="section" id="what-is">
+        <h2>What is a BIP39 generator?</h2>
+        <p>A BIP39 generator turns random data (entropy) into a list of words from the standard 2048-word list. The words are a human-friendly way to write down that random number. Wallets then turn the words into a <a href="/bip39-converter/#mnemonic-to-seed">512-bit seed</a> from which keys are derived.</p>
+        <p>Generating a mnemonic is just <em>encoding</em> randomness: the quality of the result depends entirely on the quality of the random source and on who could see it.</p>
+      </section>
+
+      <section class="section" id="word-counts">
+        <h2>12 vs 24 words</h2>
+        <p>Every length is a different amount of entropy plus a checksum of one bit per 32 bits of entropy.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Words</th><th>Entropy (ENT)</th><th>Checksum (CS)</th><th>Total bits</th></tr></thead>
+            <tbody>
+              {WORD_COUNTS.map((n) => { const s = sizes(n); return <tr><td>{n}</td><td class="mono">{s.ent}</td><td class="mono">{s.cs}</td><td class="mono">{s.total}</td></tr>; })}
+            </tbody>
+          </table>
+        </div>
+        <p>12 and 24 words are by far the most common. 15, 18 and 21 are valid BIP39 but supported by fewer wallets.</p>
+      </section>
+
+      <section class="section" id="checksum">
+        <h2>Entropy and the checksum</h2>
+        <p>The generator takes the SHA-256 hash of the entropy, appends its first ENT/32 bits, and splits the result into 11-bit numbers. Each number selects a word. Because the final word carries the checksum, a typo in any word is usually detected. The <a href="/bip39-checksum/">checksum page</a> shows every step with real test vectors.</p>
+      </section>
+
+      <section class="section" id="randomness">
+        <h2>Where the randomness comes from</h2>
+        <p>This page uses <code>crypto.getRandomValues</code>, which asks the operating system’s cryptographically secure random number generator. It does not use <code>Math.random</code>, mouse movement, or text you type. If secure randomness is unavailable, the Generate button is disabled.</p>
+      </section>
+
+      <section class="section" id="online-offline">
+        <h2>Online vs offline generation</h2>
+        <p>Running in the browser means the words are never sent to a server — but it does not make a website trustworthy. The code you receive could be changed, and extensions or malware on your device could read the page. That is why this generator is labelled for testing and learning.</p>
+        <p>For a real wallet, prefer a hardware wallet, or download the <a href="/bip39-offline/">standalone offline file</a>, check its SHA-256, and run it on a device with networking turned off.</p>
+      </section>
+    </article>
+  </div>
+
+  <Faq items={faq} />
+  <Related keys={['what', 'checksum', 'validator', 'offline']} />
+</Base>

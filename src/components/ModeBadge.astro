@@ -1,0 +1,27 @@
+---
+import { PAGES } from '../site';
+interface Props { offline?: boolean; version?: string }
+const { offline = false, version } = Astro.props;
+---
+<details class:list={['mode', { offline }]} data-popover>
+  <summary aria-label={offline ? `Offline build ${version}. About this mode` : 'Online mode: runs in your browser. About this mode'}>
+    <span class="dot" aria-hidden="true"></span>
+    {offline
+      ? <><span class="full">Offline build v{version}</span><span class="short">Offline</span></>
+      : <><span class="full">Online · runs in your browser</span><span class="short">Online</span></>}
+  </summary>
+  <div class="panel">
+    {offline ? (
+      <>
+        <p><strong>You are using the standalone offline file.</strong> It contains all code and data and makes no network requests. Its Content Security Policy blocks network connections.</p>
+        <p>For real recovery phrases, keep this device disconnected while the file is open, and close the tab when you are done.</p>
+      </>
+    ) : (
+      <>
+        <p><strong>Tools on this site compute in your browser.</strong> Nothing you type is sent to a server, stored, or put in the URL.</p>
+        <p>To check this yourself, open your browser’s developer tools → Network, use a tool, and confirm no request is made.</p>
+        <p>A website can still be changed by whoever controls the server. For a real recovery phrase, use the <a href={PAGES.offline.href}>verified offline file</a>.</p>
+      </>
+    )}
+  </div>
+</details>

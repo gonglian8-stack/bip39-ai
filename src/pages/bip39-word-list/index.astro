@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro';
+import ToolWordList from '../../components/ToolWordList.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import { PAGES, SITE } from '../../site';
+import { UPSTREAM_SHA256 } from '../../data/wordlist-english';
+import { faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Word List – All 2048 English Words';
+const description = 'Search, browse and download the official BIP39 English word list: 2048 words with numbers, 11-bit indexes, and TXT, JSON and CSV files with SHA-256 hashes.';
+const faq: FaqItem[] = [
+  { q: 'Why does BIP39 use exactly 2048 words?', a: '<p>2048 = 2<sup>11</sup>, so each word encodes exactly 11 bits. A 12-word phrase is 132 bits: 128 bits of entropy plus a 4-bit checksum.</p>' },
+  { q: 'Is the first word number 0 or 1?', a: '<p>In the specification and in code, indexes run from 0 (<code>abandon</code>) to 2047 (<code>zoo</code>). Many printed lists and backup cards number them 1 to 2048. This page shows both.</p>' },
+  { q: 'Can I write only the first four letters of each word?', a: '<p>The English list is designed so the first four letters identify each word uniquely, and many wallets accept four-letter input. Writing full words is still clearer for anyone who has to restore from your backup.</p>' },
+  { q: 'Are 12 random words from this list a valid mnemonic?', a: '<p>Usually not. The last word carries a checksum, so only about 1 in 16 random 12-word combinations is valid. Use the <a href="/bip39-generator/">generator</a> to produce valid test phrases.</p>' },
+  { q: 'Are other languages available?', a: '<p>BIP39 defines word lists in several languages, including Japanese, Spanish, French, Italian, Korean, Czech, Portuguese and Chinese. This site currently publishes English only; other lists are planned. Mnemonics are not interchangeable between languages.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.wordlist.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.wordlist.href, title: 'Word List' }]}
+  schema={[faqSchema(faq), {
+    '@type': 'Dataset', name: 'BIP39 English word list', description: 'The 2048-word English list defined by BIP39.',
+    url: new URL(PAGES.wordlist.href, SITE.url).href, isBasedOn: SITE.wordlistUrl, license: 'https://opensource.org/licenses/MIT',
+    distribution: ['txt', 'json', 'csv'].map((f) => ({ '@type': 'DataDownload', encodingFormat: f === 'txt' ? 'text/plain' : f === 'json' ? 'application/json' : 'text/csv', contentUrl: `${SITE.url}/wordlist/english.${f}` })),
+  }]}>
+  <header class="page-head">
+    <h1>BIP39 Word List (English, 2048 words)</h1>
+    <p class="lede">The official English list, searchable by word or number. <a href="#download">Download</a> as TXT, JSON or CSV.</p>
+    <p class="small muted u-mt8">Source: <a href={SITE.wordlistUrl} rel="noopener">bitcoin/bips english.txt</a> · SHA-256 <code class="u-break">{UPSTREAM_SHA256}</code> · checked {SITE.lastReviewed}</p>
+  </header>
+
+  <ToolWordList />
+
+  <article class="prose">
+    <section class="section" id="why-2048">
+      <h2>Why 2048 words</h2>
+      <p>Each word stands for an 11-bit number, and 2<sup>11</sup> = 2048. The mnemonic is the entropy plus checksum written 11 bits at a time. That is also why the list order matters: word 0 is always <code>abandon</code> and word 2047 is always <code>zoo</code>.</p>
+    </section>
+    <section class="section" id="design">
+      <h2>How the English list was designed</h2>
+      <ul>
+        <li><strong>Unique first four letters</strong> — every word can be identified from its first four letters.</li>
+        <li><strong>No very similar words</strong> — pairs such as <em>build/built</em> were avoided to reduce mistakes.</li>
+        <li><strong>Sorted alphabetically</strong> — so a word can be found quickly and its index looked up.</li>
+        <li><strong>Common, short words</strong> — 3 to 8 letters.</li>
+      </ul>
+    </section>
+    <section class="section" id="order">
+      <h2>Word order and the checksum</h2>
+      <p>Picking any 12 words from the list does not make a valid mnemonic. The final word includes checksum bits calculated from the others, so for 12 words only 128 of the 2048 words fit in the last position. See <a href="/bip39-checksum/">how the checksum is calculated</a>.</p>
+    </section>
+    <section class="section" id="languages">
+      <h2>Languages and compatibility</h2>
+      <p>The same entropy produces different words in each language’s list, and the seed is derived from the words themselves. A Spanish mnemonic entered into a wallet expecting English will fail or restore a different wallet. Most wallets support English only.</p>
+    </section>
+  </article>
+
+  <Faq items={faq} />
+  <Related keys={['checksum', 'validator', 'what']} />
+</Base>

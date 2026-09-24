@@ -1,0 +1,51 @@
+---
+import Trust from '../../layouts/Trust.astro';
+import { PAGES } from '../../site';
+---
+<Trust title="Security Model – BIP39.ai" description="What BIP39.ai protects against, what it cannot protect against, and how to verify its claims yourself."
+  path={PAGES.security.href} h1="Security Model"
+  summary="The tools run entirely in your browser and cannot make network connections. That removes some risks, not all. Here is exactly what we claim and how you can check it.">
+  <h2 id="claims">What we claim</h2>
+  <ul>
+    <li><strong>No input leaves your device.</strong> All BIP39 calculations run in your browser. The site sends a Content Security Policy with <code>connect-src 'none'</code>, which makes the browser block any network connection from page scripts.</li>
+    <li><strong>No third-party code.</strong> Scripts and styles load only from this domain. There are no ads, analytics, chat widgets, session recording, fonts or CDNs.</li>
+    <li><strong>No storage of secrets.</strong> Inputs are never written to cookies, localStorage, sessionStorage, IndexedDB or the URL. The only thing stored is your light/dark theme choice.</li>
+    <li><strong>No forms.</strong> Sensitive inputs are not inside a form, so they cannot be submitted into a URL or to a server, even if a script fails.</li>
+    <li><strong>Correctness is tested.</strong> Every build checks all 24 official English BIP39 test vectors and 120 cross-checks against the independent python-mnemonic library.</li>
+  </ul>
+
+  <h2 id="verify">How to verify it yourself</h2>
+  <ol>
+    <li>Open developer tools → <strong>Network</strong>, then use any tool. No request should appear.</li>
+    <li>Look at the response headers of this page for <code>Content-Security-Policy</code>.</li>
+    <li>For the strongest guarantee, use the <a href="/bip39-offline/">offline file</a>: check its SHA-256, disconnect, and open it locally.</li>
+  </ol>
+
+  <h2 id="not-protected">What this does not protect against</h2>
+  <ul>
+    <li><strong>A compromised server.</strong> Whoever controls this website could serve different code tomorrow. Browser-side code is only as trustworthy as its delivery. The offline file with a verified hash addresses this.</li>
+    <li><strong>Your device.</strong> Malware, keyloggers, screen recording and clipboard monitoring can see anything on screen.</li>
+    <li><strong>Browser extensions</strong> with permission to read pages can read what you type.</li>
+    <li><strong>Memory.</strong> Clearing a field resets the page, but JavaScript cannot guarantee every copy is erased from browser or system memory.</li>
+    <li><strong>Phishing copies</strong> of this site. Check the address is exactly <code>bip39.ai</code>.</li>
+  </ul>
+
+  <h2 id="guidance">Our guidance</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Website</th><th>Offline file</th></tr></thead>
+      <tbody>
+        <tr><td>Official test vectors</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Newly generated test phrases</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>A real recovery phrase or passphrase</td><td>No</td><td>Yes, on a disconnected, trusted device</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>For a wallet holding significant funds, let a hardware wallet generate and keep the phrase.</p>
+
+  <h2 id="not-claimed">What we do not claim</h2>
+  <p>This project has <strong>not</strong> had an independent security audit. It does not offer reproducible builds or signed releases yet. These are listed as “Not yet available” on the <a href="/bip39-offline/#evidence">offline page</a> and will be updated with details if they happen.</p>
+
+  <h2 id="report">Reporting a vulnerability</h2>
+  <p>TODO: security contact address and disclosure policy will be published with the source repository.</p>
+</Trust>

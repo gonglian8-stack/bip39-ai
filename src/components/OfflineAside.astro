@@ -1,0 +1,15 @@
+---
+import { PAGES, SITE } from '../site';
+import Icon from './Icon.astro';
+interface Props { online: string[]; offline: string[] }
+const { online, offline } = Astro.props;
+---
+<div class="card aside-card">
+  <h2>Online or offline?</h2>
+  <p class="label">Fine on this website</p>
+  <ul>{online.map((t) => <li><span class="mk y" aria-hidden="true">✓</span><span>{t}</span></li>)}</ul>
+  <p class="label">Use the offline file</p>
+  <ul>{offline.map((t) => <li><span class="mk n" aria-hidden="true">!</span><span>{t}</span></li>)}</ul>
+  <a class="btn primary u-w100" href={PAGES.offline.href}><Icon name="download" /> Offline tool v{SITE.version}</a>
+  <p class="small muted u-mt12">Your input is not sent, stored or logged. <a href={PAGES.security.href}>How to verify</a></p>
+</div>

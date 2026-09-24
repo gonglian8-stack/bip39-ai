@@ -1,0 +1,22 @@
+---
+import Base from './Base.astro';
+import { PAGES, SITE } from '../site';
+interface Props { title: string; description: string; path: string; h1: string; summary: string }
+const { title, description, path, h1, summary } = Astro.props;
+const others = (['security', 'privacy', 'openSource', 'offline'] as const).filter((k) => PAGES[k].href !== path);
+---
+<Base title={title} description={description} path={path}
+  crumbs={[{ href: '/', title: 'Home' }, { href: path, title: h1 }]}>
+  <header class="page-head">
+    <h1>{h1}</h1>
+    <p class="lede">{summary}</p>
+    <p class="small muted u-mt8">Last reviewed {SITE.lastReviewed} · applies to version {SITE.version}</p>
+  </header>
+  <article class="prose"><slot /></article>
+  <section class="section" aria-labelledby="trust-more">
+    <h2 id="trust-more">More on trust</h2>
+    <div class="cards three">
+      {others.map((k) => <a class="card link-card" href={PAGES[k].href}><h3>{PAGES[k].title}</h3><p>{PAGES[k].desc}</p></a>)}
+    </div>
+  </section>
+</Base>

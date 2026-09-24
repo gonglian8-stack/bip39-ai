@@ -1,0 +1,109 @@
+---
+import Base from '../../layouts/Base.astro';
+import Faq from '../../components/Faq.astro';
+import Related from '../../components/Related.astro';
+import Notice from '../../components/Notice.astro';
+import SecretField from '../../components/SecretField.astro';
+import { PAGES } from '../../site';
+import { bytesToHex, seedFingerprint, toSeed } from '../../lib/bip39';
+import { VECTORS } from '../../data/vectors';
+import { hexHtml, wordsHtml } from '../../lib/render';
+import { faqSchema, type FaqItem } from '../../lib/schema';
+
+const title = 'BIP39 Passphrase (25th Word) Explained';
+const description = 'How the optional BIP39 passphrase works: the same mnemonic with another passphrase gives a completely different seed, with no error. Live demo.';
+const mnemonic = VECTORS[0].mnemonic;
+const examples = await Promise.all(['', 'TREZOR', 'trezor'].map(async (pp) => {
+  const seed = await toSeed(mnemonic, pp);
+  return { pp, seed: bytesToHex(seed), fp: seedFingerprint(seed) };
+}));
+const faq: FaqItem[] = [
+  { q: 'Is the passphrase really a “25th word”?', a: '<p>It is often called that, but it doesn’t have to be a word. It can be any text — spaces, symbols, any length. It is also not checked against the word list and has no checksum.</p>' },
+  { q: 'What happens if I enter the wrong passphrase?', a: '<p>Nothing visible. There is no error: the wallet simply opens a different, empty wallet. This is by design (it allows plausible deniability) but it means a mistyped passphrase looks exactly like a lost wallet.</p>' },
+  { q: 'Is the passphrase case-sensitive?', a: '<p>Yes. <code>TREZOR</code> and <code>trezor</code> produce different seeds, as the demo shows. Text is normalized with Unicode NFKD, so visually identical characters typed in different ways give the same result.</p>' },
+  { q: 'Is a passphrase the same as a wallet password or PIN?', a: '<p>No. A PIN or app password unlocks a device or file. The BIP39 passphrase is part of the seed calculation itself; without it, the funds cannot be recovered, even with the correct 24 words.</p>' },
+  { q: 'Can a lost passphrase be recovered?', a: '<p>Not by this site, and in general only by guessing. There is no reset. Back up the passphrase separately from the mnemonic, with the same care.</p>' },
+];
+---
+<Base title={title} description={description} path={PAGES.passphrase.href}
+  crumbs={[{ href: '/', title: 'Home' }, { href: '/what-is-bip39/', title: 'Learn' }, { href: PAGES.passphrase.href, title: 'Passphrase' }]}
+  schema={[faqSchema(faq)]}>
+  <header class="page-head">
+    <h1>BIP39 Passphrase</h1>
+    <p class="lede">An optional passphrase is mixed into the seed. The same words with a different passphrase give a completely different wallet — and there is no error message.</p>
+  </header>
+
+  <section class="tool" data-tool="passphrase" aria-labelledby="demo-h">
+    <div class="tool-section">
+      <h2 id="demo-h" class="mt-0 u-fs20">Same mnemonic, different passphrases</h2>
+      <div class="output">
+        <div class="output-head"><span class="label">Mnemonic · 12 words</span><span class="tag vector">Test vector #1</span></div>
+        <ol class="words">{<Fragment set:html={wordsHtml(mnemonic.split(' '))} />}</ol>
+      </div>
+      <div class="compare">
+        {examples.map((e) => (
+          <div class="col">
+            <span class="label">Passphrase</span>
+            <p class="pp">{e.pp ? `"${e.pp}"` : <span class="muted">(empty)</span>}</p>
+            <span class="label">Seed fingerprint</span>
+            <p class="fp">{e.fp}</p>
+            <details><summary>Show full seed</summary><div class="seed hex" set:html={hexHtml(e.seed)} /></details>
+          </div>
+        ))}
+        <div class="col secret-col">
+          <label class="label" for="pp-try">Try a test passphrase</label>
+          <input id="pp-try" class="field u-m4-12" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-sensitive placeholder="Type anything" aria-describedby="pp-try-note" />
+          <span class="label">Seed fingerprint</span>
+          <p class="fp" data-fp aria-live="polite">—</p>
+          <p class="small mb-0" id="pp-try-note">Computed in your browser. Test text only.</p>
+        </div>
+      </div>
+      <p class="clip-note">Fingerprint = first 8 hex characters of SHA-256(seed). It lets you compare seeds without showing them; it is not a wallet fingerprint as used by BIP32.</p>
+    </div>
+    <div class="tool-section">
+      <Notice kind="secret">Every passphrase produces a valid seed. If you mistype it, a wallet will open a <strong>different, empty</strong> wallet instead of showing an error.</Notice>
+      <p class="small mb-0">Want to see full seeds for your own test data? Use <a href="/bip39-converter/#mnemonic-to-seed">Converter → Mnemonic to seed</a>.</p>
+    </div>
+  </section>
+  <script>import '../../scripts/passphrase';</script>
+
+  <article class="prose">
+    <section class="section" id="how">
+      <h2>How the passphrase changes the seed</h2>
+      <p>BIP39 derives the seed with PBKDF2-HMAC-SHA512, using the mnemonic as the password and the text <code>"mnemonic" + passphrase</code> as the salt, with 2048 iterations. With no passphrase the salt is just <code>"mnemonic"</code>. Any change to the passphrase changes the salt, and therefore the entire 512-bit seed.</p>
+    </section>
+    <section class="section" id="not-a-word">
+      <h2>It is not really a word</h2>
+      <p>“25th word” is a popular name, not part of the standard. The passphrase can be empty, a sentence, or a long random string. It is not taken from the word list and has no checksum, so no tool can tell you whether it is “correct”.</p>
+    </section>
+    <section class="section" id="unicode">
+      <h2>Case, spaces and Unicode</h2>
+      <ul>
+        <li>Case matters: <code>TREZOR</code> ≠ <code>trezor</code>.</li>
+        <li>Spaces matter, including leading and trailing spaces.</li>
+        <li>Both mnemonic and passphrase are normalized with Unicode NFKD, so characters such as “é” give the same result whether typed as one character or as “e” plus an accent.</li>
+      </ul>
+    </section>
+    <section class="section" id="mnemonic-vs-passphrase">
+      <h2>Mnemonic vs passphrase</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Mnemonic</th><th>Passphrase</th></tr></thead>
+          <tbody>
+            <tr><td>Required</td><td>Yes</td><td>No (empty by default)</td></tr>
+            <tr><td>Format</td><td>12–24 words from the list</td><td>Any text</td></tr>
+            <tr><td>Error detection</td><td>Checksum</td><td>None</td></tr>
+            <tr><td>If lost</td><td>Funds unrecoverable</td><td>Funds unrecoverable</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="section" id="backup">
+      <h2>Backing up a passphrase</h2>
+      <p>A passphrase protects against someone who finds your written mnemonic — but only if it is stored somewhere else. Losing it has the same result as losing the words. Record it exactly, including case and spaces, and test a restore with a small amount before relying on it.</p>
+    </section>
+  </article>
+
+  <Faq items={faq} />
+  <Related keys={['converter', 'what', 'offline']} />
+</Base>

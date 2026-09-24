@@ -1,0 +1,46 @@
+---
+import { PAGES, SITE, TOOLS } from '../site';
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h2>Tools</h2>
+        <ul>
+          {TOOLS.map((t) => <li><a href={t.href}>{t.title}</a></li>)}
+          <li><a href={PAGES.wordlist.href}>Word List</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Learn</h2>
+        <ul>
+          <li><a href={PAGES.what.href}>What Is BIP39?</a></li>
+          <li><a href={PAGES.passphrase.href}>Passphrase</a></li>
+          <li><a href="/bip39-checksum/#how-it-works">Checksum explained</a></li>
+          <li><a href={PAGES.guides.href}>Guides</a></li>
+          <li><a href={SITE.specUrl} rel="noopener">BIP39 specification ↗</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Trust</h2>
+        <ul>
+          <li><a href={PAGES.security.href}>Security model</a></li>
+          <li><a href={PAGES.privacy.href}>Privacy</a></li>
+          <li><a href={PAGES.openSource.href}>Open source</a></li>
+          <li><a href={PAGES.offline.href}>Offline download</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>About</h2>
+        <p class="small muted">Free, open-source BIP39 tools that run in your browser and offline. No accounts, no ads, no analytics.</p>
+        <ul><li><a href={PAGES.changelog.href}>Changelog</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-meta small">
+      <span>Version {SITE.version}{SITE.commit ? ` · commit ${SITE.commit}` : ''}</span>
+      <span>{SITE.license} License</span>
+      <span>Maintained by {SITE.maintainer ? <a href={SITE.maintainer.url} rel="noopener">{SITE.maintainer.name}</a> : 'TODO'}</span>
+      <span>Content last reviewed {SITE.lastReviewed}</span>
+    </div>
+  </div>
+</footer>

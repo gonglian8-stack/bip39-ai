@@ -1,0 +1,22 @@
+---
+import Trust from '../../layouts/Trust.astro';
+import { PAGES } from '../../site';
+---
+<Trust title="Privacy – BIP39.ai" description="BIP39.ai collects no personal data, uses no cookies or analytics, and never receives what you type into its tools."
+  path={PAGES.privacy.href} h1="Privacy"
+  summary="We don’t collect what you type, we don’t use cookies, and this site has no analytics.">
+  <h2 id="tool-input">What you type into tools</h2>
+  <p>Never collected. Mnemonics, entropy, seeds and passphrases are processed only in your browser and are not sent, stored, logged or put in URLs. See the <a href="/security/">security model</a> for how this is enforced.</p>
+
+  <h2 id="analytics">Analytics and cookies</h2>
+  <p>This site uses no analytics, tracking pixels, advertising, session recording or cookies. The only data stored in your browser is your theme choice (light or dark) in localStorage, which never leaves your device.</p>
+
+  <h2 id="hosting">Hosting logs</h2>
+  <p>The site is served by Cloudflare Pages. Like any web host, Cloudflare processes technical request data such as IP address, user agent and requested URL to deliver pages and protect against abuse. Because tool input never appears in requests or URLs, it cannot appear in these logs. Cloudflare’s handling is described in its own privacy policy.</p>
+
+  <h2 id="search">Search performance</h2>
+  <p>We use Google Search Console, which reports aggregate search queries and clicks that lead to this site. It does not run on this site or see your activity here.</p>
+
+  <h2 id="changes">Changes</h2>
+  <p>If we ever add privacy-respecting analytics, this page will be updated first, and tool inputs will remain excluded.</p>
+</Trust>

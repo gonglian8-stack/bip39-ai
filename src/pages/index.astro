@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Notice from '../components/Notice.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
+import Faq from '../components/Faq.astro';
+import { PAGES, SITE } from '../site';
+import { faqSchema, type FaqItem } from '../lib/schema';
+
+const title = 'BIP39 Mnemonic Tools – Generate, Validate, Word List';
+const description = 'Free, open-source BIP39 tools: generate and validate mnemonics, convert entropy and seeds, browse the 2048-word list, and download an offline version.';
+const tasks = [
+  { href: PAGES.generator.href, icon: 'generate', t: 'Generate', d: 'Create a 12–24 word test mnemonic' },
+  { href: PAGES.validator.href, icon: 'validate', t: 'Validate', d: 'Check words and checksum' },
+  { href: PAGES.converter.href, icon: 'convert', t: 'Convert', d: 'Entropy ↔ mnemonic → seed' },
+  { href: PAGES.wordlist.href, icon: 'grid', t: 'Browse Word List', d: 'All 2048 English words' },
+] as const;
+const faq: FaqItem[] = [
+  { q: 'Is BIP39.ai a wallet?', a: '<p>No. It has no accounts, never connects to a blockchain, and does not show private keys, addresses or balances. It is a set of tools and explanations for the BIP39 standard.</p>' },
+  { q: 'Does anything I type leave my device?', a: '<p>No. All tools run in your browser and the site’s security policy blocks the page from making network connections. You can confirm it in your browser’s developer tools. See the <a href="/security/">security model</a>.</p>' },
+  { q: 'When should I use the offline version?', a: '<p>Whenever real recovery phrases or passphrases are involved. Download the file, check its SHA-256, disconnect from the network, then open it. <a href="/bip39-offline/">Get the offline tool</a>.</p>' },
+  { q: 'Can this site recover a wallet or find missing words?', a: '<p>No. It does not recover wallets, brute-force missing words or guess passphrases.</p>' },
+];
+---
+<Base title={title} description={description} path="/" schema={[faqSchema(faq)]}>
+  <section class="page-head with-top u-pt40">
+    <h1>BIP39 Mnemonic Tools</h1>
+    <p class="lede u-mw62">BIP39 encodes random entropy as a 12–24 word mnemonic and derives a wallet seed from it. Generate, validate and convert test data here — in your browser, with nothing sent anywhere.</p>
+    <nav class="tasks" aria-label="Tasks">
+      {tasks.map((t) => <a class="task" href={t.href}><Icon name={t.icon} /><strong>{t.t}</strong><span>{t.d}</span></a>)}
+    </nav>
+    <Notice kind="secret">Working with a <strong>real</strong> recovery phrase? Use the <a href={PAGES.offline.href}>offline version</a>: download it, verify its SHA-256, and open it with networking turned off.</Notice>
+  </section>
+
+  <section class="section" aria-labelledby="tools-h">
+    <h2 id="tools-h">Tools</h2>
+    <div class="cards three">
+      <a class="card link-card" href={PAGES.generator.href}><h3>Generator</h3><p>12, 15, 18, 21 or 24 words from secure browser randomness, with entropy and checksum shown.</p></a>
+      <a class="card link-card" href={PAGES.validator.href}><h3>Validator</h3><p>Finds invalid word counts, misspelled words (with suggestions) and checksum mismatches.</p></a>
+      <a class="card link-card" href={PAGES.converter.href}><h3>Converter</h3><p>Entropy → mnemonic, mnemonic → entropy, and mnemonic + passphrase → seed.</p></a>
+      <a class="card link-card" href={PAGES.checksum.href}><h3>Checksum</h3><p>Step through SHA-256, checksum bits and 11-bit groups with official test vectors.</p></a>
+      <a class="card link-card" href={PAGES.wordlist.href}><h3>Word List</h3><p>Search 2048 words by word or number; download TXT, JSON or CSV with hashes.</p></a>
+      <a class="card link-card" href={PAGES.passphrase.href}><h3>Passphrase demo</h3><p>See how one mnemonic produces different seeds with different passphrases.</p></a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="flow-h">
+    <h2 id="flow-h">From entropy to seed</h2>
+    <FlowDiagram />
+    <p class="u-mt16"><a href={PAGES.what.href}>Read how BIP39 works <span aria-hidden="true">→</span></a></p>
+  </section>
+
+  <section class="section" aria-labelledby="trust-h">
+    <h2 id="trust-h">Offline and open source</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Check it instead of trusting it</h3>
+        <dl class="evidence">
+          <div><dt>Version</dt><dd class="val">{SITE.version}{SITE.commit ? ` (${SITE.commit})` : ''}</dd></div>
+          <div><dt>License</dt><dd>{SITE.license}</dd></div>
+          <div><dt>Source code</dt><dd>{SITE.repoUrl ? <a href={SITE.repoUrl} rel="noopener">{SITE.repoUrl.replace('https://', '')}</a> : <span class="tag na">Not yet published</span>}</dd></div>
+          <div><dt>Network requests while computing</dt><dd>None — blocked by Content Security Policy</dd></div>
+          <div><dt>Test vectors</dt><dd>All 24 official English vectors pass, plus cross-checks with python-mnemonic</dd></div>
+          <div><dt>Independent audit</dt><dd><span class="tag na">Not yet available</span></dd></div>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>Offline tool</h3>
+        <p>One HTML file with the generator, validator, converter, checksum and word list. No network access, no external files.</p>
+        <div class="btn-row"><a class="btn primary" href={PAGES.offline.href}><Icon name="download" /> Download &amp; verify</a><a class="btn" href={PAGES.security.href}>Security model</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section prose" aria-labelledby="concepts-h">
+    <h2 id="concepts-h">Core concepts</h2>
+    <dl>
+      <dt><strong>Entropy</strong></dt><dd class="u-mb12">128–256 random bits. Everything else is derived from it.</dd>
+      <dt><strong>Mnemonic</strong></dt><dd class="u-mb12">The entropy plus a checksum, written as 12–24 words from a <a href="/bip39-word-list/">2048-word list</a>.</dd>
+      <dt><strong>Checksum</strong></dt><dd class="u-mb12">A few bits of SHA-256 in the last word that catch typos. <a href="/bip39-checksum/">How it works</a>.</dd>
+      <dt><strong>Passphrase</strong></dt><dd class="u-mb12">Optional extra text; changes the seed completely. <a href="/bip39-passphrase/">Demo</a>.</dd>
+      <dt><strong>Seed</strong></dt><dd class="u-mb12">512 bits derived from words + passphrase, used by BIP32 to create keys.</dd>
+    </dl>
+  </section>
+
+  <Faq items={faq} />
+
+  <section class="section prose" aria-labelledby="res-h">
+    <h2 id="res-h">Resources</h2>
+    <ul>
+      <li><a href={SITE.specUrl} rel="noopener">BIP39 specification</a></li>
+      <li><a href={SITE.vectorsUrl} rel="noopener">Official test vectors</a></li>
+      <li><a href={PAGES.openSource.href}>Our source code, dependencies and tests</a></li>
+    </ul>
+  </section>
+</Base>

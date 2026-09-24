@@ -1,0 +1,14 @@
+---
+import { PAGES, type PageKey } from '../site';
+interface Props { keys: PageKey[]; title?: string }
+const { keys, title = 'Related' } = Astro.props;
+---
+<section class="section" aria-labelledby="related-h">
+  <h2 id="related-h">{title}</h2>
+  <div class="cards three">
+    {keys.map((k) => {
+      const p = PAGES[k] as { href: string; title: string; desc?: string };
+      return <a class="card link-card" href={p.href}><h3>{p.title}</h3><p>{p.desc}</p></a>;
+    })}
+  </div>
+</section>

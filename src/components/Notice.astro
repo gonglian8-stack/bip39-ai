@@ -1,0 +1,7 @@
+---
+import Icon from './Icon.astro';
+interface Props { kind?: 'info' | 'secret' | 'warning' | 'error'; id?: string; class?: string }
+const { kind = 'info', id, class: cls } = Astro.props;
+const icon = kind === 'info' ? 'info' : kind === 'error' ? 'x' : 'alert';
+---
+<div class:list={['notice', kind, cls]} id={id}><Icon name={icon} /><p><slot /></p></div>
