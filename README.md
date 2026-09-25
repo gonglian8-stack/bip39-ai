@@ -1,53 +1,87 @@
-# BIP39.ai 产品规划与设计交接
+# BIP39.ai
 
-版本：2026-09-24 / v1
+**Offline-first, open-source BIP39 tools that run entirely in your browser.**
 
-本目录用于从零规划新的 BIP39.ai，不继承旧站源码、信息架构、视觉或产品承诺。
+**→ Use it at [bip39.ai](https://bip39.ai/)** · [Download the offline file](https://bip39.ai/bip39-offline/) · [Security model](https://bip39.ai/security/)
 
-## 当前结论
+![BIP39.ai](public/og.png)
 
-BIP39.ai 首版定位为：
+## Tools
 
-> A trustworthy, offline-first BIP39 toolkit and learning center.
+| Tool | What it does |
+|---|---|
+| [Generator](https://bip39.ai/bip39-generator/) | 12, 15, 18, 21 or 24-word test mnemonics from `crypto.getRandomValues`, with entropy and checksum shown |
+| [Validator](https://bip39.ai/bip39-validator/) | Checks word count, wordlist membership (with suggestions for typos) and checksum |
+| [Converter](https://bip39.ai/bip39-converter/) | Entropy → mnemonic, mnemonic → entropy, mnemonic + passphrase → 512-bit seed |
+| [Checksum](https://bip39.ai/bip39-checksum/) | Step-by-step walkthrough: entropy bits, SHA-256, checksum bits, 11-bit groups, words |
+| [Word List](https://bip39.ai/bip39-word-list/) | The official 2048 English words; search, and download as TXT / JSON / CSV |
+| [Passphrase demo](https://bip39.ai/bip39-passphrase/) | How one mnemonic gives different seeds with different passphrases |
 
-产品以真实的 `bip39 + 修饰词` 搜索任务为边界，不先做宽泛的“钱包恢复平台”，也不为了 `.ai` 强行加入聊天机器人。公开网页负责解释、演示和下载；涉及真实助记词的操作优先引导到离线版本。
+Plus explainers: [What is BIP39?](https://bip39.ai/what-is-bip39/) and [guides](https://bip39.ai/guides/).
 
-## 文件
+**Not included, on purpose:** private keys, addresses, balance checks, wallet recovery, brute-forcing missing words, accounts, analytics.
 
-- `PRODUCT-PLAN.md`：完整产品规划、商业模式、阶段与指标。
-- `KEYWORD-MAP.md`：关键词簇、搜索意图、页面映射与建页边界。
-- `PAGE-SPECS.md`：首版各页面的产品和 SEO 规格。
-- `SECURITY-AND-TRUST.md`：秘密数据边界、隐私和可信构建要求。
-- `ACCEPTANCE.md`：设计、开发和上线验收条件。
-- `CLAUDE-BRIEF.md`：交给 Claude 的设计任务说明（已被“由 Claude 负责完整产品”取代，保留作参考）。
-- `design/`：设计原理、信息架构、设计系统、用户流程、设计自检。
+## Security model
 
-## 当前状态（2026-09-24，v0.1.0）
+- **No input leaves the page.** All BIP39 work happens in the browser. The site sends a Content Security Policy with `connect-src 'none'`, so page scripts cannot make network requests — you can check this in your browser's Network panel.
+- **No third-party code.** No ads, analytics, trackers, CDNs or web fonts. Scripts and styles come only from the same origin.
+- **Nothing stored.** Inputs never go into cookies, local/session storage, IndexedDB or the URL, and sensitive fields are not inside forms.
+- **Honest limits.** A website can still be changed by whoever controls its server, and a compromised device can read the screen. **Don't type a real recovery phrase into any website.** For real phrases, use the offline file on a disconnected device.
 
-- 已完成：产品范围、关键词架构、页面规格、安全边界；设计文档（`design/`）；12 个核心页面 + Guides（2 篇）+ Changelog + 404；`llms.txt`；离线单文件构建；测试（24 个官方向量 + 120 个 python-mnemonic 交叉验证 + 40 个无效 checksum）。
-- 待补：维护者信息、GitHub 仓库地址、安全联系方式、部署、GSC；精确搜索量/KD/CPC 仍未采集。
-- 说明：当前关键词判断来自 SERP 与同类页面观察，不得把未获得的搜索量写成确定数字。
+Not yet available: independent security audit, reproducible builds, signed releases. Details: [bip39.ai/security](https://bip39.ai/security/).
 
-## 开发
+## Offline file
 
-需要 Node ≥ 22.12（见 `.nvmrc`）。
+A single HTML file with the generator, validator, converter, checksum and word list inlined. Its own CSP allows only its hashed inline script and style, and forbids all connections.
+
+1. Download it from [bip39.ai/bip39-offline](https://bip39.ai/bip39-offline/), which publishes its SHA-256.
+2. Verify:
+   ```bash
+   shasum -a 256 bip39-ai-offline-v0.1.0.html          # macOS / Linux
+   Get-FileHash .\bip39-ai-offline-v0.1.0.html -Algorithm SHA256   # Windows PowerShell
+   ```
+3. Disconnect from the network, then open the file in a browser.
+
+You can also build it yourself from this repository (`npm run build` → `dist/downloads/`).
+
+## Correctness
+
+Every build runs the test suite before building:
+
+- all 24 official English [BIP39 test vectors](https://github.com/trezor/python-mnemonic/blob/master/vectors.json) (entropy ↔ mnemonic, seed with passphrase `TREZOR`, checksum steps);
+- 120 random cases cross-checked against the independent [python-mnemonic](https://github.com/trezor/python-mnemonic) reference implementation, across all word counts and non-ASCII passphrases;
+- 40 invalid-checksum phrases that must be rejected;
+- the English wordlist byte-for-byte against [bitcoin/bips `english.txt`](https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt) (SHA-256 `2f5eed53…3b24dbda`).
+
+Mnemonic encoding and seed derivation use [@scure/bip39](https://github.com/paulmillr/scure-bip39) and [@noble/hashes](https://github.com/paulmillr/noble-hashes) (pinned versions).
+
+## Development
+
+Requires Node ≥ 22 (see `.nvmrc`).
 
 ```bash
 npm install
-npm run dev          # 本地开发
-npm test             # 测试
-npm run build        # 生成 dist/（含离线文件 dist/downloads/）
-npm run check:dist   # 构建产物检查：CSP 兼容、SEO 基础、内链
-node scripts/serve-dist.mjs   # 带生产 CSP 头的本地预览
+npm run dev          # local dev server
+npm test             # test vectors and cross-checks
+npm run build        # static site + offline file in dist/
+npm run check:dist   # CSP compatibility, SEO basics, internal links
 ```
 
-目录：`src/lib/bip39.ts` 核心逻辑 · `src/components/Tool*.astro` 五个工具 · `src/pages/` 页面 · `scripts/` 构建与校验 · `data/upstream/` 固定的官方词表与测试向量 · `design/` 设计文档。部署见 `DEPLOY.md`，内容更新见 `CONTENT-GUIDE.md`。
+Stack: [Astro](https://astro.build/) static site, TypeScript, plain CSS. Hosted on Cloudflare Workers static assets. See [DEPLOY.md](DEPLOY.md).
 
-## 推荐协作顺序
+Project layout: `src/lib/bip39.ts` (core logic) · `src/components/Tool*.astro` (tools) · `src/pages/` (pages and guides) · `scripts/` (build and checks) · `data/upstream/` (pinned official wordlist and vectors) · `design/` (design docs).
 
-1. 用户确认本规划中的产品范围与首版页面。
-2. Claude 阅读本目录全部文件，先提交 UX/视觉系统和响应式原型。
-3. Codex 按 `ACCEPTANCE.md` 审核设计是否满足搜索意图、安全边界与页面规格。
-4. 设计通过后再让 Claude 提交技术架构和实现计划。
-5. 开发后小批上线，通过 GSC 与产品事件验证，再决定扩页。
+## Contributing and security reports
 
+Issues and pull requests are welcome. Please report vulnerabilities privately via [GitHub security advisories](https://github.com/gonglian8-stack/bip39-ai/security/advisories/new), not public issues — see [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE) · Maintained by [gonglian8-stack](https://github.com/gonglian8-stack)
+
+<details>
+<summary>中文说明</summary>
+
+BIP39.ai 是开源、离线优先的 BIP39 工具站，所有计算都在浏览器本地完成，页面无法发起网络请求。产品规划、关键词和页面规格见 [PLANNING.zh-CN.md](PLANNING.zh-CN.md) 与相关中文文档，设计文档见 `design/`，内容更新流程见 [CONTENT-GUIDE.md](CONTENT-GUIDE.md)。
+
+</details>

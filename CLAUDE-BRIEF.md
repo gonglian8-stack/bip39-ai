@@ -2,7 +2,7 @@
 
 请完整阅读本目录：
 
-1. `README.md`
+1. `PLANNING.zh-CN.md`
 2. `PRODUCT-PLAN.md`
 3. `KEYWORD-MAP.md`
 4. `PAGE-SPECS.md`
