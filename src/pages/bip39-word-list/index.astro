@@ -20,8 +20,12 @@ const faq: FaqItem[] = [
 <Base title={title} description={description} path={PAGES.wordlist.href}
   crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.wordlist.href, title: 'Word List' }]}
   schema={[faqSchema(faq), {
-    '@type': 'Dataset', name: 'BIP39 English word list', description: 'The 2048-word English list defined by BIP39.',
+    '@type': 'Dataset', name: 'BIP39 English word list',
+    description: 'The official 2048-word English list defined by BIP39, used to encode 11-bit values as mnemonic words. Identical to bitcoin/bips english.txt.',
+    // Authors and license as stated in the BIP39 header (bip-0039.mediawiki).
+    creator: ['Marek Palatinus', 'Pavol Rusnak', 'Aaron Voisine', 'Sean Bowe'].map((name) => ({ '@type': 'Person', name })),
     url: new URL(PAGES.wordlist.href, SITE.url).href, isBasedOn: SITE.wordlistUrl, license: 'https://opensource.org/licenses/MIT',
+    isAccessibleForFree: true,
     distribution: ['txt', 'json', 'csv'].map((f) => ({ '@type': 'DataDownload', encodingFormat: f === 'txt' ? 'text/plain' : f === 'json' ? 'application/json' : 'text/csv', contentUrl: `${SITE.url}/wordlist/english.${f}` })),
   }]}>
   <header class="page-head">
