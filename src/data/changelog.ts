@@ -3,6 +3,15 @@ export interface Release { version: string; date: string; changes: string[] }
 
 export const CHANGELOG: Release[] = [
   {
+    version: '0.1.1',
+    date: '2026-10-05',
+    changes: [
+      'Converter renamed “Mnemonic Code Converter”, with a short explanation of what it converts.',
+      'Validator now described as a seed phrase checker.',
+      'Word list structured data fixed; IndexNow submissions for faster Bing indexing.',
+    ],
+  },
+  {
     version: '0.1.0',
     date: '2026-09-24',
     changes: [

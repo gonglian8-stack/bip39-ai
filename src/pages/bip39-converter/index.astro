@@ -7,8 +7,8 @@ import Related from '../../components/Related.astro';
 import { PAGES } from '../../site';
 import { appSchema, faqSchema, type FaqItem } from '../../lib/schema';
 
-const title = 'BIP39 Converter – Entropy, Mnemonic and Seed';
-const description = 'Convert test data between BIP39 entropy, mnemonic and 512-bit seed, with an optional passphrase. Runs in your browser; no private keys are shown.';
+const title = 'BIP39 Mnemonic Code Converter – Entropy, Words, Seed';
+const description = 'BIP39 mnemonic code converter: entropy to mnemonic, mnemonic to entropy, and mnemonic + passphrase to seed. Runs in your browser; no private keys shown.';
 const faq: FaqItem[] = [
   { q: 'Why doesn’t the converter show private keys or addresses?', a: '<p>Keys and addresses come from BIP32/BIP44-style derivation applied to the seed, which is a separate standard. Showing them would turn a learning tool into a wallet recovery tool. This page stops at the BIP39 seed.</p>' },
   { q: 'Is the seed the same as the entropy?', a: '<p>No. Entropy is the 128–256 random bits the words encode. The seed is a 512-bit value produced by running the mnemonic and passphrase through PBKDF2-HMAC-SHA512 with 2048 iterations. You can get from entropy to mnemonic and back, but you cannot recover the mnemonic from the seed.</p>' },
@@ -18,10 +18,10 @@ const faq: FaqItem[] = [
 ---
 <Base title={title} description={description} path={PAGES.converter.href}
   crumbs={[{ href: '/', title: 'Home' }, { href: PAGES.converter.href, title: 'Converter' }]}
-  schema={[appSchema('BIP39 Converter', PAGES.converter.href, description), faqSchema(faq)]}>
+  schema={[appSchema('BIP39 Mnemonic Code Converter', PAGES.converter.href, description), faqSchema(faq)]}>
   <header class="page-head">
-    <h1>BIP39 Converter</h1>
-    <p class="lede">Convert test data between entropy, mnemonic and seed. Pick a direction, load a test vector or paste your own test data.</p>
+    <h1>BIP39 Mnemonic Code Converter</h1>
+    <p class="lede">Convert test data between entropy, mnemonic words and seed: an entropy converter, a mnemonic decoder and a seed calculator in one page. Pick a direction, then load a test vector or paste your own test data.</p>
   </header>
 
   <div class="tool-layout">
@@ -34,6 +34,11 @@ const faq: FaqItem[] = [
   </div>
 
   <article class="prose">
+    <section class="section" id="what-is">
+      <h2>What is a mnemonic code converter?</h2>
+      <p>A BIP39 mnemonic code converter translates between the three forms of the same wallet secret: the raw <strong>entropy</strong> (hex), the <strong>mnemonic code</strong> (12–24 words) and the 512-bit <strong>seed</strong>. Entropy and mnemonic convert in both directions, because the words are just the entropy plus a checksum written 11 bits at a time. The seed can only be computed forwards. This converter stops at the seed and never derives private keys or addresses.</p>
+    </section>
+
     <section class="section" id="how-it-fits">
       <h2>Entropy, mnemonic and seed</h2>
       <div class="table-wrap">

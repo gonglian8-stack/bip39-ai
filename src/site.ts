@@ -44,8 +44,8 @@ export const LEARN: NavItem[] = [
 export const PAGES = {
   home: { href: '/', title: 'Home' },
   generator: { href: '/bip39-generator/', title: 'BIP39 Generator', desc: 'Generate 12–24 word test mnemonics and see their entropy and checksum.' },
-  validator: { href: '/bip39-validator/', title: 'BIP39 Validator', desc: 'Check a test mnemonic’s word count, words and checksum.' },
-  converter: { href: '/bip39-converter/', title: 'BIP39 Converter', desc: 'Convert between entropy, mnemonic and seed with test data.' },
+  validator: { href: '/bip39-validator/', title: 'BIP39 Validator', desc: 'Seed phrase checker: word count, words and checksum.' },
+  converter: { href: '/bip39-converter/', title: 'BIP39 Mnemonic Code Converter', desc: 'Convert between entropy, mnemonic and seed with test data.' },
   checksum: { href: '/bip39-checksum/', title: 'BIP39 Checksum', desc: 'Follow each step from entropy to the final checksum word.' },
   wordlist: { href: '/bip39-word-list/', title: 'BIP39 Word List', desc: 'Search and download the official 2048 English words.' },
   passphrase: { href: '/bip39-passphrase/', title: 'BIP39 Passphrase', desc: 'See how an optional passphrase changes the seed.' },

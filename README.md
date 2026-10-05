@@ -37,8 +37,8 @@ A single HTML file with the generator, validator, converter, checksum and word l
 1. Download it from [bip39.ai/bip39-offline](https://bip39.ai/bip39-offline/), which publishes its SHA-256.
 2. Verify:
    ```bash
-   shasum -a 256 bip39-ai-offline-v0.1.0.html          # macOS / Linux
-   Get-FileHash .\bip39-ai-offline-v0.1.0.html -Algorithm SHA256   # Windows PowerShell
+   shasum -a 256 bip39-ai-offline-v0.1.1.html          # macOS / Linux
+   Get-FileHash .\bip39-ai-offline-v0.1.1.html -Algorithm SHA256   # Windows PowerShell
    ```
 3. Disconnect from the network, then open the file in a browser.
 

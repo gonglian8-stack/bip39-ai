@@ -83,8 +83,8 @@ BIP39 specification ↗ (github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 |---|---|---|
 | `/` | BIP39 Mnemonic Tools – Generate, Validate, Word List | BIP39 Mnemonic Tools |
 | `/bip39-generator/` | BIP39 Generator – 12 to 24 Word Test Mnemonics | BIP39 Mnemonic Generator |
-| `/bip39-validator/` | BIP39 Validator – Check Words and Checksum | BIP39 Mnemonic Validator |
-| `/bip39-converter/` | BIP39 Converter – Entropy, Mnemonic and Seed | BIP39 Converter |
+| `/bip39-validator/` | BIP39 Validator & Seed Phrase Checker | BIP39 Mnemonic Validator |
+| `/bip39-converter/` | BIP39 Mnemonic Code Converter – Entropy, Words, Seed | BIP39 Mnemonic Code Converter |
 | `/bip39-checksum/` | BIP39 Checksum Explained – Step-by-Step Calculator | BIP39 Checksum |
 | `/bip39-word-list/` | BIP39 Word List – All 2048 English Words | BIP39 Word List (English, 2048 words) |
 | `/bip39-passphrase/` | BIP39 Passphrase (25th Word) Explained | BIP39 Passphrase |
